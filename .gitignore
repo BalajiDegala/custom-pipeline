@@ -1,0 +1,15 @@
+addons/*
+storage/
+RELEASE
+
+# Frontend build artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.vite/
+
+# Ignore dumped projects from git
+/*.sql
+
+# JetBrains IDE data
+.idea

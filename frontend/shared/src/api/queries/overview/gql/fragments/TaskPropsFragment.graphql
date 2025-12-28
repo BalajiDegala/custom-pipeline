@@ -1,0 +1,17 @@
+fragment TaskPropsFragment on TaskNode {
+  id
+  folderId
+  label
+  name
+  ownAttrib
+  status
+  tags
+  taskType
+  updatedAt
+  createdAt
+  active
+  assignees
+  allAttrib
+  hasReviewables
+  parents
+}
