@@ -1,0 +1,164 @@
+/* ShotGrid-inspired Typography System */
+
+:root {
+  /* Font families */
+  --font-family-primary: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+  --font-family-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+
+  /* Font weights */
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Font sizes - ShotGrid scale */
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 30px;
+  --font-size-4xl: 36px;
+
+  /* Line heights */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-loose: 1.7;
+
+  /* Letter spacing */
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+
+  /* Material Design Typography Scale - Updated for ShotGrid style */
+  --md-sys-typescale-display-large-font-family-name: var(--font-family-primary);
+  --md-sys-typescale-display-large-font-size: var(--font-size-4xl);
+  --md-sys-typescale-display-large-font-weight: var(--font-weight-regular);
+  --md-sys-typescale-display-large-line-height: var(--line-height-tight);
+
+  --md-sys-typescale-display-medium-font-family-name: var(--font-family-primary);
+  --md-sys-typescale-display-medium-font-size: var(--font-size-3xl);
+  --md-sys-typescale-display-medium-font-weight: var(--font-weight-regular);
+  --md-sys-typescale-display-medium-line-height: var(--line-height-tight);
+
+  --md-sys-typescale-headline-large-font-family-name: var(--font-family-primary);
+  --md-sys-typescale-headline-large-font-size: var(--font-size-2xl);
+  --md-sys-typescale-headline-large-font-weight: var(--font-weight-semibold);
+  --md-sys-typescale-headline-large-line-height: var(--line-height-normal);
+
+  --md-sys-typescale-headline-medium-font-family-name: var(--font-family-primary);
+  --md-sys-typescale-headline-medium-font-size: var(--font-size-xl);
+  --md-sys-typescale-headline-medium-font-weight: var(--font-weight-semibold);
+  --md-sys-typescale-headline-medium-line-height: var(--line-height-normal);
+
+  --md-sys-typescale-title-large-font-family-name: var(--font-family-primary);
+  --md-sys-typescale-title-large-font-size: var(--font-size-lg);
+  --md-sys-typescale-title-large-font-weight: var(--font-weight-medium);
+  --md-sys-typescale-title-large-line-height: var(--line-height-normal);
+
+  --md-sys-typescale-body-large-font-family-name: var(--font-family-primary);
+  --md-sys-typescale-body-large-font-size: var(--font-size-md);
+  --md-sys-typescale-body-large-font-weight: var(--font-weight-regular);
+  --md-sys-typescale-body-large-line-height: var(--line-height-normal);
+
+  --md-sys-typescale-body-medium-font-family-name: var(--font-family-primary);
+  --md-sys-typescale-body-medium-font-size: var(--font-size-base);
+  --md-sys-typescale-body-medium-font-weight: var(--font-weight-regular);
+  --md-sys-typescale-body-medium-line-height: var(--line-height-normal);
+
+  --md-sys-typescale-body-small-font-family-name: var(--font-family-primary);
+  --md-sys-typescale-body-small-font-size: var(--font-size-sm);
+  --md-sys-typescale-body-small-font-weight: var(--font-weight-regular);
+  --md-sys-typescale-body-small-line-height: var(--line-height-normal);
+
+  --md-sys-typescale-label-large-font-family-name: var(--font-family-primary);
+  --md-sys-typescale-label-large-font-size: var(--font-size-base);
+  --md-sys-typescale-label-large-font-weight: var(--font-weight-medium);
+  --md-sys-typescale-label-large-line-height: var(--line-height-normal);
+
+  --md-sys-typescale-label-medium-font-family-name: var(--font-family-primary);
+  --md-sys-typescale-label-medium-font-size: var(--font-size-sm);
+  --md-sys-typescale-label-medium-font-weight: var(--font-weight-medium);
+  --md-sys-typescale-label-medium-line-height: var(--line-height-normal);
+
+  --md-sys-typescale-label-small-font-family-name: var(--font-family-primary);
+  --md-sys-typescale-label-small-font-size: var(--font-size-xs);
+  --md-sys-typescale-label-small-font-weight: var(--font-weight-medium);
+  --md-sys-typescale-label-small-line-height: var(--line-height-normal);
+}
+
+/* ShotGrid-style utility classes */
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-base); }
+.text-md { font-size: var(--font-size-md); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+
+.font-light { font-weight: var(--font-weight-light); }
+.font-normal { font-weight: var(--font-weight-regular); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-disabled { color: var(--text-disabled); }
+
+/* ShotGrid-style headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  margin: 0 0 16px 0;
+  color: var(--text-primary);
+}
+
+h1 { font-size: var(--font-size-4xl); }
+h2 { font-size: var(--font-size-3xl); }
+h3 { font-size: var(--font-size-2xl); }
+h4 { font-size: var(--font-size-xl); }
+h5 { font-size: var(--font-size-lg); }
+h6 { font-size: var(--font-size-md); }
+
+/* Clean paragraph styling */
+p {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  margin: 0 0 16px 0;
+  color: var(--text-primary);
+}
+
+/* Code styling */
+code, pre {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  background-color: var(--md-sys-color-surface-container);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+pre {
+  padding: 16px;
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+}
+
+/* Table text styling */
+.table-text {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--text-primary);
+}
+
+.table-header {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}

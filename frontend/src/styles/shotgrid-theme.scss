@@ -1,0 +1,121 @@
+/* ShotGrid-Inspired Color Scheme */
+:root {
+  /* Primary Colors - ShotGrid Blue Theme */
+  --md-sys-color-primary: #1a73e8;
+  --md-sys-color-primary-container: #d2e3fc;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-on-primary-container: #041e49;
+  --md-sys-color-primary-hover: #1557b0;
+  --md-sys-color-primary-active: #1348a0;
+
+  /* Secondary Colors - Professional Gray */
+  --md-sys-color-secondary: #5f6368;
+  --md-sys-color-secondary-container: #e8eaed;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-on-secondary-container: #1c1c1e;
+  --md-sys-color-secondary-hover: #4a4d52;
+  --md-sys-color-secondary-active: #3c4043;
+
+  /* Tertiary Colors - ShotGrid Accent */
+  --md-sys-color-tertiary: #00acc1;
+  --md-sys-color-tertiary-container: #b3e5fc;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-on-tertiary-container: #002f3d;
+  --md-sys-color-tertiary-hover: #00838f;
+  --md-sys-color-tertiary-active: #006978;
+
+  /* Surface Colors - Clean ShotGrid-like backgrounds */
+  --md-sys-color-surface: #f8f9fa;
+  --md-sys-color-surface-dim: #f1f3f4;
+  --md-sys-color-surface-bright: #ffffff;
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #f8f9fa;
+  --md-sys-color-surface-container: #f1f3f4;
+  --md-sys-color-surface-container-high: #e8eaed;
+  --md-sys-color-surface-container-highest: #dadce0;
+  --md-sys-color-on-surface: #202124;
+  --md-sys-color-on-surface-variant: #5f6368;
+
+  /* Background Colors */
+  --md-sys-color-background: #ffffff;
+  --md-sys-color-on-background: #202124;
+
+  /* Panel and Navigation */
+  --panel-background: #f8f9fa;
+  --panel-border: #e8eaed;
+  --nav-background: #ffffff;
+  --nav-hover: #f8f9fa;
+
+  /* ShotGrid-specific colors for data visualization */
+  --sg-status-ready: #34a853;
+  --sg-status-in-progress: #fbbc04;
+  --sg-status-review: #ea4335;
+  --sg-status-approved: #34a853;
+  --sg-status-hold: #ff6f00;
+
+  /* Table colors - Clean and minimal */
+  --color-table-border: #e8eaed;
+  --color-table-row: #ffffff;
+  --color-table-row-high: #f8f9fa;
+  --color-table-hover: #f1f3f4;
+  --color-table-row-hover: #f1f3f4;
+  --color-table-selected: #e8f0fe;
+  --color-table-selected-row: #d2e3fc;
+  --color-table-readonly-focused: #f8f9fa;
+
+  /* Cards and containers */
+  --card-background: #ffffff;
+  --card-border: #e8eaed;
+  --card-shadow: 0 1px 3px rgba(60,64,67,.12), 0 1px 2px rgba(60,64,67,.24);
+  --card-shadow-hover: 0 2px 6px rgba(60,64,67,.15), 0 1px 3px rgba(60,64,67,.30);
+
+  /* Typography colors */
+  --text-primary: #202124;
+  --text-secondary: #5f6368;
+  --text-disabled: #9aa0a6;
+  --text-on-primary: #ffffff;
+  --text-on-surface: #202124;
+
+  /* Interactive elements */
+  --button-primary-bg: #1a73e8;
+  --button-primary-hover: #1557b0;
+  --button-secondary-bg: #ffffff;
+  --button-secondary-border: #dadce0;
+  --button-secondary-hover: #f8f9fa;
+
+  /* Success, Warning, Error */
+  --color-success: #34a853;
+  --color-warning: #fbbc04;
+  --color-error: #ea4335;
+  --color-info: #1a73e8;
+
+  /* Form elements */
+  --input-background: #ffffff;
+  --input-border: #dadce0;
+  --input-border-focus: #1a73e8;
+  --input-text: #202124;
+  --input-placeholder: #9aa0a6;
+
+  /* Shadows and elevation */
+  --shadow-low: 0 1px 3px rgba(60,64,67,.12), 0 1px 2px rgba(60,64,67,.24);
+  --shadow-medium: 0 4px 6px rgba(60,64,67,.12), 0 2px 4px rgba(60,64,67,.24);
+  --shadow-high: 0 8px 24px rgba(60,64,67,.15), 0 4px 8px rgba(60,64,67,.30);
+
+  /* Borders and dividers */
+  --border-color: #e8eaed;
+  --divider-color: #dadce0;
+}
+
+/* Dark theme override (optional - ShotGrid is primarily light) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --md-sys-color-surface: #1f1f1f;
+    --md-sys-color-background: #121212;
+    --md-sys-color-on-surface: #e8eaed;
+    --md-sys-color-on-background: #e8eaed;
+    --panel-background: #2d2d2d;
+    --card-background: #1f1f1f;
+    --text-primary: #e8eaed;
+    --text-secondary: #9aa0a6;
+  }
+}

@@ -1,30 +1,24 @@
 import styled from 'styled-components'
 
 export const NavBar = styled.nav`
-    padding-right: 8px;
-    border-bottom: 1px solid var(--md-sys-color-outline-variant);
-    background-color: var(--panel-background);
-    padding: 0 8px;
+    background-color: var(--md-sys-color-surface-container-low);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0;
+    box-shadow: var(--shadow-low);
 
     ul {
         display: flex;
         flex-direction: row;
-        align-items: center;
-        gap: var(--base-gap-small);
-        /* reset defaults */
+        align-items: stretch;
+        gap: 0;
         list-style: none;
         margin: 0;
         padding: 0;
-
-        /* this hides the border of the navbar by putting the active tab border over it */
-        position: relative;
-        top: 1px;
-        margin-bottom: -1px;
-
-        /* overflow */
+        height: 48px;
         width: 100%;
         overflow-x: auto;
-        /* hide scroll bar */
+        
+        /* Hide scrollbar but keep functionality */
         scrollbar-width: none;
         -ms-overflow-style: none;
         &::-webkit-scrollbar {
@@ -35,32 +29,53 @@ export const NavBar = styled.nav`
 
 export const NavItem = styled.li`
     user-select: none;
-    /* NavLink */
+    display: flex;
+    align-items: stretch;
+    
+    /* ShotGrid-style navigation links */
     a {
-        padding: 2px 4px;
-        padding-bottom: 4px;
-        display: block;
-        border: 1px solid transparent;
-        border-radius: 4px 4px 0 0;
-
-        /* this will be fixed with theme buttons */
-        button {
-            padding: 4px 16px;
-            max-height: unset;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        text-decoration: none;
+        color: var(--text-secondary);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        letter-spacing: var(--letter-spacing-wide);
+        text-transform: uppercase;
+        position: relative;
+        transition: all 0.2s ease;
+        border-bottom: 2px solid transparent;
+        white-space: nowrap;
+        
+        &:hover {
+            color: var(--text-primary);
+            background-color: var(--md-sys-color-surface-container);
         }
-
+        
         &.active {
-            background-color: var(--md-sys-color-background);
-            border: 1px solid var(--md-sys-color-outline-variant);
-            border-bottom: 1px solid var(--color-grey-01);
-
-            button {
-                &:hover {
-                    background-color: unset;
-                }
+            color: var(--md-sys-color-primary);
+            border-bottom-color: var(--md-sys-color-primary);
+            background-color: var(--md-sys-color-surface);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        /* Buttons inside navigation */
+        button {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            transition: all 0.2s ease;
+            
+            &:hover {
+                background-color: var(--md-sys-color-surface-container);
+                border-color: var(--md-sys-color-primary);
+                color: var(--md-sys-color-primary);
             }
-
-            border-bottom: 1px solid var(--md-sys-color-background);
         }
     }
 `
@@ -68,5 +83,6 @@ export const NavItem = styled.li`
 export const Views = styled.span`
     display: flex;
     align-items: center;
-    margin-left: -8px;
+    gap: 8px;
+    margin-left: 8px;
 `
