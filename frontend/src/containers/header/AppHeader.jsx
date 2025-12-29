@@ -21,6 +21,7 @@ import clsx from 'clsx'
 import InboxNotificationIcon from './InboxNotification'
 import ReleaseInstallerPrompt from '@containers/ReleaseInstallerDialog/ReleaseInstallerPrompt/ReleaseInstallerPrompt'
 import ChatBubbleButton from './ChatBubbleButton'
+import { Brand } from '@components/Brand'
 
 const FlexWrapper = styled.div`
   display: flex;
@@ -151,16 +152,17 @@ const Header = () => {
 
   return (
     <nav className="primary" onClick={handleNavClick}>
+      {/* Brand Section */}
+      <Brand to="/dashboard/tasks">Pipeline Management</Brand>
+      
       <FlexWrapper>
-        <Link to={'/dashboard/tasks'}>
-          <HeaderButton
-            icon="home"
-            label="Home"
-            variant="nav"
-            className={clsx({ selected: location.pathname.startsWith('/dashboard') })}
-            id="home-button"
-          />
-        </Link>
+        <HeaderButton
+          icon="home"
+          label="Home"
+          variant="nav"
+          className={clsx({ selected: location.pathname.startsWith('/dashboard') })}
+          id="home-button"
+        />
 
         {user.uiExposureLevel >= 500 && (
           <HeaderButton

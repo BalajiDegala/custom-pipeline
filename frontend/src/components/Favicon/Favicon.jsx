@@ -6,7 +6,7 @@ const Favicon = () => {
   const user = useSelector((state) => state.user)
   const { data: hasUnread } = useGetInboxHasUnreadQuery({}, { skip: !user })
   return (
-    <Helmet defer={false} defaultTitle="AYON" titleTemplate="%s">
+    <Helmet defer={false} defaultTitle="Pipeline Management" titleTemplate="%s | Pipeline">
       <link
         rel="apple-touch-icon"
         sizes="180x180"
@@ -25,8 +25,8 @@ const Favicon = () => {
         href={`/favicon-16x16${hasUnread ? '-new' : ''}.png`}
       />
       <link rel="manifest" href={`/site${hasUnread ? '-new' : ''}.webmanifest`} />
-      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#00d7a0" />
-      <meta name="msapplication-TileColor" content="#00aba9" />
+      <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#1a73e8" />
+      <meta name="msapplication-TileColor" content="#1a73e8" />
     </Helmet>
   )
 }
