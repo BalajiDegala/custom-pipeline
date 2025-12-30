@@ -138,111 +138,80 @@ const ResultsNode: React.FC<ResultsNodeProps> = ({
 
     // Build GraphQL query from chain
     let query = 'query FlowResults {\n'
-    let indent = '  '
     
     // Start with project
-    const projectNode = chain.find(n => n.type === 'project')
-    if (!projectNode) {
-      query += `${indent}project(name: "${projectName}") {\n`
-      indent += '  '
-    }
-    
-    query += `${indent}name\n`
-    query += `${indent}code\n`
+    query += `  project(name: "${projectName}") {\n`
+    query += `    name\n`
+    query += `    code\n`
     
     // Add folders if in chain
     const foldersNode = chain.find(n => n.type === 'folders')
     if (foldersNode) {
       const selectedFolders = foldersNode.config?.selectedFolders || []
-      query += `${indent}folders`
       
       if (selectedFolders.length > 0) {
-        query += `(ids: [${selectedFolders.map((id: string) => `"${id}"`).join(', ')}], first: 100)`
+        query += `    folders(ids: [${selectedFolders.map((id: string) => `"${id}"`).join(', ')}], first: 100) {\n`
       } else {
-        query += `(first: 100)`
+        query += `    folders(first: 100) {\n`
       }
       
-      query += ' {\n'
-      indent += '  '
-      query += `${indent}edges {\n`
-      indent += '  '
-      query += `${indent}node {\n`
-      indent += '  '
-      query += `${indent}id\n`
-      query += `${indent}name\n`
-      query += `${indent}folderType\n`
-      query += `${indent}path\n`
+      query += `      edges {\n`
+      query += `        node {\n`
+      query += `          id\n`
+      query += `          name\n`
+      query += `          folderType\n`
+      query += `          path\n`
       
       // Add products if in chain
       const productsNode = chain.find(n => n.type === 'products')
       if (productsNode) {
         const selectedProducts = productsNode.config?.selectedProducts || []
-        query += `${indent}products`
         
         if (selectedProducts.length > 0) {
-          query += `(ids: [${selectedProducts.map((id: string) => `"${id}"`).join(', ')}], first: 100)`
+          query += `          products(ids: [${selectedProducts.map((id: string) => `"${id}"`).join(', ')}], first: 100) {\n`
         } else {
-          query += `(first: 100)`
+          query += `          products(first: 100) {\n`
         }
         
-        query += ' {\n'
-        indent += '  '
-        query += `${indent}edges {\n`
-        indent += '  '
-        query += `${indent}node {\n`
-        indent += '  '
-        query += `${indent}id\n`
-        query += `${indent}name\n`
-        query += `${indent}productType\n`
+        query += `            edges {\n`
+        query += `              node {\n`
+        query += `                id\n`
+        query += `                name\n`
+        query += `                productType\n`
         
         // Add versions if in chain
         const versionsNode = chain.find(n => n.type === 'versions')
         if (versionsNode) {
           const selectedVersions = versionsNode.config?.selectedVersions || []
-          query += `${indent}versions`
           
           if (selectedVersions.length > 0) {
-            query += `(ids: [${selectedVersions.map((id: string) => `"${id}"`).join(', ')}], first: 100)`
+            query += `                versions(ids: [${selectedVersions.map((id: string) => `"${id}"`).join(', ')}], first: 100) {\n`
           } else {
-            query += `(first: 100)`
+            query += `                versions(first: 100) {\n`
           }
           
-          query += ' {\n'
-          indent += '  '
-          query += `${indent}edges {\n`
-          indent += '  '
-          query += `${indent}node {\n`
-          indent += '  '
-          query += `${indent}id\n`
-          query += `${indent}version\n`
-          query += `${indent}author\n`
-          indent = indent.slice(2)
-          query += `${indent}}\n`
-          indent = indent.slice(2)
-          query += `${indent}}\n`
-          indent = indent.slice(2)
-          query += `${indent}}\n`
+          query += `                  edges {\n`
+          query += `                    node {\n`
+          query += `                      id\n`
+          query += `                      version\n`
+          query += `                      author\n`
+          query += `                    }\n`
+          query += `                  }\n`
+          query += `                }\n`
         }
         
-        indent = indent.slice(2)
-        query += `${indent}}\n`
-        indent = indent.slice(2)
-        query += `${indent}}\n`
-        indent = indent.slice(2)
-        query += `${indent}}\n`
+        query += `              }\n`
+        query += `            }\n`
+        query += `          }\n`
       }
       
-      indent = indent.slice(2)
-      query += `${indent}}\n`
-      indent = indent.slice(2)
-      query += `${indent}}\n`
-      indent = indent.slice(2)
-      query += `${indent}}\n`
+      query += `        }\n`
+      query += `      }\n`
+      query += `    }\n`
     }
     
-    indent = indent.slice(2)
-    query += `${indent}}\n`
-    query += '}'
+    query += `  }\n`
+    query += `}`
     
     return query
   }
@@ -280,6 +249,7 @@ const ResultsNode: React.FC<ResultsNodeProps> = ({
       }
       
       const data = await response.json()
+      console.log('Query response data:', data)
       
       if (data.errors) {
         throw new Error(data.errors[0]?.message || 'GraphQL query failed')
@@ -287,6 +257,7 @@ const ResultsNode: React.FC<ResultsNodeProps> = ({
       
       // Flatten the nested results into table rows
       const flattenedResults = flattenResults(data.data)
+      console.log('Setting results:', flattenedResults)
       setResults(flattenedResults)
       
       // Extract column names
@@ -315,9 +286,16 @@ const ResultsNode: React.FC<ResultsNodeProps> = ({
       if (Array.isArray(obj)) {
         obj.forEach(item => flatten(item, prefix))
       } else if (obj && typeof obj === 'object') {
+        // Handle project level
+        if (obj.project) {
+          flatten(obj.project, prefix)
+          return
+        }
+        
         // Check for known list fields with edges structure
         if (obj.folders?.edges) {
           const folders = extractNodes(obj.folders)
+          console.log('Flattening folders:', folders)
           folders.forEach((folder: any) => {
             if (folder.products?.edges) {
               const products = extractNodes(folder.products)
@@ -346,10 +324,12 @@ const ResultsNode: React.FC<ResultsNodeProps> = ({
                 }
               })
             } else {
+              // No products - just show folder info
               rows.push({
-                folderName: folder.name,
+                id: folder.id,
+                name: folder.name,
                 folderType: folder.folderType,
-                folderPath: folder.path,
+                path: folder.path,
               })
             }
           })
@@ -366,6 +346,7 @@ const ResultsNode: React.FC<ResultsNodeProps> = ({
     }
     
     flatten(data)
+    console.log('Flattened results:', rows)
     return rows
   }
 

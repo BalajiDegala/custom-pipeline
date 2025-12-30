@@ -51,9 +51,10 @@ const FlowPage: React.FC<FlowPageProps> = ({ projectName }) => {
       return
     }
     
-    // Handle configurable nodes
+    // Handle configurable nodes - find the node from our state (with config)
     if (['folders', 'products', 'versions'].includes(node.type)) {
-      setConfigNode(node)
+      const nodeWithConfig = nodes.find(n => n.id === node.id) || node
+      setConfigNode(nodeWithConfig)
     }
   }
 

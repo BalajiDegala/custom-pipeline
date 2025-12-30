@@ -124,6 +124,11 @@ const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({
   const [availableOptions, setAvailableOptions] = useState<Record<string, any[]>>({})
   const [loading, setLoading] = useState(true)
 
+  // Sync config state when node.config changes
+  useEffect(() => {
+    setConfig(node.config || {})
+  }, [node.id, node.config])
+
   useEffect(() => {
     // Fetch available options based on node type
     fetchAvailableOptions()
@@ -155,7 +160,10 @@ const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({
 
       const data = await response.json()
       console.log('GraphQL response:', data)
+      console.log('Project data:', data?.data?.project)
+      console.log('Folders edges:', data?.data?.project?.folders?.edges)
       const options = extractOptionsFromResponse(data, node.type)
+      console.log('Extracted options:', options)
       setAvailableOptions(options)
     } catch (error) {
       console.error('Failed to fetch options:', error)
@@ -262,8 +270,13 @@ const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({
       case 'folders':
         return (
           <ConfigSection>
-            <Label>Select Folders</Label>
+            <Label>Select Folders ({availableOptions.folders?.length || 0} available)</Label>
             <MultiSelect>
+              {availableOptions.folders?.length === 0 && (
+                <div style={{ padding: '12px', color: 'var(--md-sys-color-on-surface-variant)' }}>
+                  No folders found in this project
+                </div>
+              )}
               {availableOptions.folders?.map((folder: any) => (
                 <CheckboxItem key={folder.id}>
                   <input
