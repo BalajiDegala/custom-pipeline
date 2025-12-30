@@ -32,7 +32,10 @@ services:
 
 
   server:
-    image: ynput/ayon:${AYON_STACK_SERVER_TAG:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: custom-pipeline:latest
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/api/info"]

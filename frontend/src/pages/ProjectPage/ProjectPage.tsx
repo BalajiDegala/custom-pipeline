@@ -40,6 +40,7 @@ import { useProjectDefaultTab } from '@hooks/useProjectDefaultTab'
 import BrowserPage from '@pages/BrowserPage'
 import GuestUserPageLocked from '@components/GuestUserPageLocked'
 import { ProjectContextProvider } from '@shared/context'
+import FlowPage from '@pages/FlowPage'
 
 const BROWSER_FLAG = 'enable-legacy-version-browser'
 
@@ -145,6 +146,13 @@ const ProjectPageInner = () => {
         path: `/projects/${projectName}/tasks`,
         module: 'tasks',
         viewType: 'taskProgress',
+        uriSync: true,
+      },
+      {
+        name: 'Flow',
+        path: `/projects/${projectName}/flow`,
+        module: 'flow',
+        viewType: 'flow',
         uriSync: true,
       },
       {
@@ -262,6 +270,9 @@ const ProjectPageInner = () => {
     }
     if (module === 'tasks') {
       return <TasksProgressPage />
+    }
+    if (module === 'flow') {
+      return <FlowPage projectName={projectName} />
     }
     if (module === 'browser') {
       if (!frontendFlags.includes(BROWSER_FLAG)) {

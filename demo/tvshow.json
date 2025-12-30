@@ -1,0 +1,444 @@
+{
+    "name": "demo_TV_Show",
+    "code": "tvshow",
+    "hierarchy": [
+        {
+            "name": "assets",
+            "_children": [
+                {
+                    "name": "characters",
+                    "_combine": 2,
+                    "_children_count": 15,
+                    "_children_naming": "tvCharacterNames",
+                    "_children": "gen_assets",
+                    "_leaf_products": [
+                        {
+                            "name": "rigMain", 
+                            "product_type": "rig",
+                            "_task_link": "rigging",
+                            "_representations": [
+                                {
+                                    "name": "ma",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.ma"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "modelMain", 
+                            "product_type": "model",
+                            "_task_link": "modeling",
+                            "_representations": [
+                                {
+                                    "name": "ma",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.ma"
+                                },
+                                {
+                                    "name": "obj",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.obj"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "textureMain", 
+                            "product_type": "texture",
+                            "_task_link": "texturing",
+                            "_representations": [
+                                {
+                                    "name": "tif",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.tif"
+                                }
+                            ]
+                        }
+                    ],
+                    "_leaf_tasks": [
+                        {
+                            "name": "concept",
+                            "task_type": "Concept",
+                            "assignees": []
+                        },
+                        {
+                            "name": "modeling",
+                            "task_type": "Modeling",
+                            "assignees": []
+                        },
+                        {
+                            "name": "rigging",
+                            "task_type": "Rigging",
+                            "assignees": []
+                        },
+                        {
+                            "name": "texturing",
+                            "task_type": "Texturing",
+                            "assignees": []
+                        }
+                    ]
+                },
+                {
+                    "name": "props",
+                    "_combine": 1,
+                    "_children_count": 25,
+                    "_children_naming": "props",
+                    "_children": "gen_assets",
+                    "_leaf_products": [
+                        {
+                            "name": "modelMain", 
+                            "product_type": "model",
+                            "_task_link": "modeling",
+                            "_representations": [
+                                {
+                                    "name": "ma",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.ma"
+                                },
+                                {
+                                    "name": "fbx",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.fbx"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "textureMain", 
+                            "product_type": "texture",
+                            "_task_link": "texturing",
+                            "_representations": [
+                                {
+                                    "name": "tif",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.tif"
+                                }
+                            ]
+                        }
+                    ],
+                    "_leaf_tasks": [
+                        {
+                            "name": "concept",
+                            "task_type": "Concept",
+                            "assignees": []
+                        },
+                        {
+                            "name": "modeling",
+                            "task_type": "Modeling",
+                            "assignees": []
+                        },
+                        {
+                            "name": "texturing",
+                            "task_type": "Texturing",
+                            "assignees": []
+                        }
+                    ]
+                },
+                {
+                    "name": "environments",
+                    "_combine": 2,
+                    "_children_count": 8,
+                    "_children_naming": "locations",
+                    "_children": "gen_assets",
+                    "_leaf_products": [
+                        {
+                            "name": "modelMain", 
+                            "product_type": "model",
+                            "_task_link": "modeling",
+                            "_representations": [
+                                {
+                                    "name": "ma",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.ma"
+                                },
+                                {
+                                    "name": "abc",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.abc"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "lookdevMain", 
+                            "product_type": "lookdev",
+                            "_task_link": "lookdev",
+                            "_representations": [
+                                {
+                                    "name": "ma",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.ma"
+                                }
+                            ]
+                        }
+                    ],
+                    "_leaf_tasks": [
+                        {
+                            "name": "concept",
+                            "task_type": "Concept",
+                            "assignees": []
+                        },
+                        {
+                            "name": "modeling",
+                            "task_type": "Modeling",
+                            "assignees": []
+                        },
+                        {
+                            "name": "lookdev",
+                            "task_type": "Lookdev",
+                            "assignees": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "season01",
+            "folder_type": "Season",
+            "_children_count": 12,
+            "_children": "gen_episodes",
+            "_leaf_products": [
+                {
+                    "name": "editMain",
+                    "product_type": "editorial",
+                    "_representations": [
+                        {
+                            "name": "mov",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.mov"
+                        },
+                        {
+                            "name": "xml",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.xml"
+                        }
+                    ]
+                },
+                {
+                    "name": "compMain",
+                    "product_type": "comp",
+                    "_representations": [
+                        {
+                            "name": "exr",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.####.exr"
+                        },
+                        {
+                            "name": "mov",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.mov"
+                        }
+                    ]
+                },
+                {
+                    "name": "animationMain",
+                    "product_type": "animation",
+                    "_representations": [
+                        {
+                            "name": "abc",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.abc"
+                        },
+                        {
+                            "name": "fbx",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.fbx"
+                        }
+                    ]
+                },
+                {
+                    "name": "renderMain",
+                    "product_type": "render",
+                    "_representations": [
+                        {
+                            "name": "exr",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.####.exr"
+                        }
+                    ]
+                }
+            ],
+            "_leaf_tasks": [
+                {
+                    "name": "animation",
+                    "task_type": "Animation",
+                    "assignees": []
+                },
+                {
+                    "name": "lighting",
+                    "task_type": "Lighting", 
+                    "assignees": []
+                },
+                {
+                    "name": "compositing",
+                    "task_type": "Compositing",
+                    "assignees": []
+                },
+                {
+                    "name": "editorial",
+                    "task_type": "Editorial",
+                    "assignees": []
+                },
+                {
+                    "name": "fx",
+                    "task_type": "FX",
+                    "assignees": []
+                }
+            ]
+        },
+        {
+            "name": "season02",
+            "folder_type": "Season", 
+            "_children_count": 14,
+            "_children": "gen_episodes",
+            "_leaf_products": [
+                {
+                    "name": "editMain",
+                    "product_type": "editorial",
+                    "_representations": [
+                        {
+                            "name": "mov",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.mov"
+                        },
+                        {
+                            "name": "xml", 
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.xml"
+                        }
+                    ]
+                },
+                {
+                    "name": "compMain",
+                    "product_type": "comp",
+                    "_representations": [
+                        {
+                            "name": "exr",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.####.exr"
+                        },
+                        {
+                            "name": "mov",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.mov"
+                        }
+                    ]
+                },
+                {
+                    "name": "animationMain", 
+                    "product_type": "animation",
+                    "_representations": [
+                        {
+                            "name": "abc",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.abc"
+                        },
+                        {
+                            "name": "fbx",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.fbx"
+                        }
+                    ]
+                },
+                {
+                    "name": "renderMain",
+                    "product_type": "render",
+                    "_representations": [
+                        {
+                            "name": "exr", 
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.####.exr"
+                        }
+                    ]
+                }
+            ],
+            "_leaf_tasks": [
+                {
+                    "name": "animation",
+                    "task_type": "Animation",
+                    "assignees": []
+                },
+                {
+                    "name": "lighting",
+                    "task_type": "Lighting",
+                    "assignees": []
+                },
+                {
+                    "name": "compositing",
+                    "task_type": "Compositing", 
+                    "assignees": []
+                },
+                {
+                    "name": "editorial",
+                    "task_type": "Editorial",
+                    "assignees": []
+                },
+                {
+                    "name": "fx",
+                    "task_type": "FX",
+                    "assignees": []
+                }
+            ]
+        },
+        {
+            "name": "season03",
+            "folder_type": "Season",
+            "_children_count": 16,
+            "_children": "gen_episodes", 
+            "_leaf_products": [
+                {
+                    "name": "editMain",
+                    "product_type": "editorial",
+                    "_representations": [
+                        {
+                            "name": "mov",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.mov"
+                        },
+                        {
+                            "name": "xml",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.xml"
+                        }
+                    ]
+                },
+                {
+                    "name": "compMain",
+                    "product_type": "comp",
+                    "_representations": [
+                        {
+                            "name": "exr",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.####.exr"
+                        },
+                        {
+                            "name": "mov",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.mov"
+                        }
+                    ]
+                },
+                {
+                    "name": "animationMain",
+                    "product_type": "animation", 
+                    "_representations": [
+                        {
+                            "name": "abc",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.abc"
+                        },
+                        {
+                            "name": "fbx",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.fbx"
+                        }
+                    ]
+                },
+                {
+                    "name": "renderMain",
+                    "product_type": "render",
+                    "_representations": [
+                        {
+                            "name": "exr",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.####.exr"
+                        }
+                    ]
+                }
+            ],
+            "_leaf_tasks": [
+                {
+                    "name": "animation",
+                    "task_type": "Animation",
+                    "assignees": []
+                },
+                {
+                    "name": "lighting",
+                    "task_type": "Lighting",
+                    "assignees": []
+                },
+                {
+                    "name": "compositing", 
+                    "task_type": "Compositing",
+                    "assignees": []
+                },
+                {
+                    "name": "editorial",
+                    "task_type": "Editorial",
+                    "assignees": []
+                },
+                {
+                    "name": "fx",
+                    "task_type": "FX",
+                    "assignees": []
+                }
+            ]
+        }
+    ]
+}

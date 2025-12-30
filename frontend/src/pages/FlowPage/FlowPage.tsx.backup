@@ -1,0 +1,205 @@
+import React, { useState, useCallback } from 'react'
+import { Panel } from '@ynput/ayon-react-components'
+import NodeGraph from './components/NodeGraph'
+import NodeConfigPanel from './components/NodeConfigPanel'
+import * as Styled from './FlowPage.styled'
+
+interface Node {
+  id: string
+  x: number
+  y: number
+  width: number
+  height: number
+  type: string
+  label: string
+  icon: string
+  description: string
+}
+
+interface Edge {
+  id: string
+  source: string
+  target: string
+}
+
+interface FlowPageProps {
+  projectName?: string
+}
+
+const FlowPage: React.FC<FlowPageProps> = ({ projectName }) => {
+  const [nodes, setNodes] = useState<Node[]>([])
+  const [edges, setEdges] = useState<Edge[]>([])
+  const [configNode, setConfigNode] = useState<Node | null>(null)
+
+  const handleNodesChange = useCallback((newNodes: Node[]) => {
+    setNodes(newNodes)
+  }, [])
+
+  const handleEdgesChange = useCallback((newEdges: Edge[]) => {
+    setEdges(newEdges)
+  }, [])
+
+  const handleNodeDoubleClick = (node: Node) => {
+    console.log('Opening configuration for node:', node.label)
+    setConfigNode(node)
+  }
+
+  const handleConfigSave = (nodeId: string, config: any) => {
+    const updatedNodes = nodes.map((n: Node) =>
+      n.id === nodeId ? { ...n, config } : n
+    )
+    setNodes(updatedNodes)
+    setConfigNode(null)
+  }
+
+  // Remove the generateGraphQLQuery function - queries will be handled by Results node
+
+  const generateGraphQLQuery = (nodeList: Node[], edgeList: Edge[]) => {
+    // Basic GraphQL query generation based on connected nodes
+    if (nodeList.length === 0) {
+      setGraphQLQuery('# Add nodes and connect them to generate a GraphQL query\n')
+      return
+    }
+
+    let query = 'query FlowQuery {\n'
+    const processedNodes = new Set<string>()
+
+    // Find root nodes (nodes without incoming edges)
+    const rootNodes = nodeList.filter(node => 
+      !edgeList.some(edge => edge.target === node.id)
+    )
+
+    if (rootNodes.length === 0 && nodeList.length > 0) {
+      // If no clear root, start with first node
+      rootNodes.push(nodeList[0])
+    }
+
+    rootNodes.forEach(rootNode => {
+      if (processedNodes.has(rootNode.id)) return
+      
+      const nodeQuery = buildNodeQuery(rootNode, nodeList, edgeList, processedNodes, 1)
+      if (nodeQuery) {
+        query += nodeQuery
+      }
+    })
+
+    query += '}'
+    setGraphQLQuery(query)
+  }
+
+  const buildNodeQuery = (
+    node: Node, 
+    allNodes: Node[], 
+    allEdges: Edge[], 
+    processed: Set<string>, 
+    depth: number
+  ): string => {
+    if (processed.has(node.id) || depth > 5) return ''
+    
+    processed.add(node.id)
+    const indent = '  '.repeat(depth)
+    
+    let nodeQuery = ''
+    
+    switch (node.type) {
+      case 'project':
+        nodeQuery = `${indent}project(name: "${projectName || 'demo'}") {\n`
+        nodeQuery += `${indent}  name\n`
+        nodeQuery += `${indent}  code\n`
+        break
+        
+      case 'folders':
+        nodeQuery = `${indent}folders {\n`
+        nodeQuery += `${indent}  id\n`
+        nodeQuery += `${indent}  name\n`
+        nodeQuery += `${indent}  folderType\n`
+        nodeQuery += `${indent}  path\n`
+        break
+        
+      case 'products':
+        nodeQuery = `${indent}products {\n`
+        nodeQuery += `${indent}  id\n`
+        nodeQuery += `${indent}  name\n`
+        nodeQuery += `${indent}  productType\n`
+        nodeQuery += `${indent}  folderId\n`
+        break
+        
+      case 'versions':
+        nodeQuery = `${indent}versions {\n`
+        nodeQuery += `${indent}  id\n`
+        nodeQuery += `${indent}  version\n`
+        nodeQuery += `${indent}  productId\n`
+        nodeQuery += `${indent}  status\n`
+        break
+        
+      case 'tasks':
+        nodeQuery = `${indent}tasks {\n`
+        nodeQuery += `${indent}  id\n`
+        nodeQuery += `${indent}  name\n`
+        nodeQuery += `${indent}  taskType\n`
+        nodeQuery += `${indent}  status\n`
+        nodeQuery += `${indent}  assignees\n`
+        break
+        
+      case 'representations':
+        nodeQuery = `${indent}representations {\n`
+        nodeQuery += `${indent}  id\n`
+        nodeQuery += `${indent}  name\n`
+        nodeQuery += `${indent}  versionId\n`
+        nodeQuery += `${indent}  files\n`
+        break
+        
+      default:
+        return ''
+    }
+    
+    // Find connected child nodes
+    const connectedEdges = allEdges.filter(edge => edge.source === node.id)
+    const childNodes = connectedEdges
+      .map(edge => allNodes.find(n => n.id === edge.target))
+      .filter(Boolean) as Node[]
+    
+    // Recursively build queries for child nodes
+    childNodes.forEach(childNode => {
+      const childQuery = buildNodeQuery(childNode, allNodes, allEdges, processed, depth + 1)
+      if (childQuery) {
+        nodeQuery += childQuery
+      }
+    })
+    
+    nodeQuery += `${indent}}\n`
+    return nodeQuery
+  }
+
+  return (
+    <Styled.FlowPageContainer>
+      <Styled.GraphContainer style={{ width: '100%' }}>
+        <Panel style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Styled.PanelHeader>
+            <h3>Pipeline Flow Editor</h3>
+            <p>Create visual queries by connecting pipeline nodes</p>
+          </Styled.PanelHeader>
+          <NodeGraph
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={handleNodesChange}
+            onEdgesChange={handleEdgesChange}
+            onNodeDoubleClick={handleNodeDoubleClick}
+            projectName={projectName}
+          />
+        </Panel>
+        
+        {configNode && (
+          <NodeConfigPanel
+            node={configNode}
+            projectName={projectName || 'demo_Commercial'}
+            onClose={() => setConfigNode(null)}
+            onSave={handleConfigSave}
+          />
+        )}
+      </Styled.GraphContainer>
+    </Styled.FlowPageContainer>
+  )
+}
+
+export default FlowPage

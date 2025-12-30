@@ -1,0 +1,367 @@
+{
+    "name": "demo_Animated_Series", 
+    "code": "anim",
+    "hierarchy": [
+        {
+            "name": "assets",
+            "_children": [
+                {
+                    "name": "characters",
+                    "_combine": 2,
+                    "_children_count": 20,
+                    "_children_naming": "cartoon_characters",
+                    "_children": "gen_assets",
+                    "_leaf_products": [
+                        {
+                            "name": "rigMain", 
+                            "product_type": "rig",
+                            "_task_link": "rigging",
+                            "_representations": [
+                                {
+                                    "name": "ma",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.ma"
+                                },
+                                {
+                                    "name": "fbx",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.fbx"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "modelMain", 
+                            "product_type": "model",
+                            "_task_link": "modeling",
+                            "_representations": [
+                                {
+                                    "name": "ma",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.ma"
+                                },
+                                {
+                                    "name": "obj",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.obj"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "textureMain", 
+                            "product_type": "texture",
+                            "_task_link": "texturing",
+                            "_representations": [
+                                {
+                                    "name": "psd",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.psd"
+                                },
+                                {
+                                    "name": "png",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.png"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "materialMain",
+                            "product_type": "material",
+                            "_task_link": "surfacing",
+                            "_representations": [
+                                {
+                                    "name": "ma",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.ma"
+                                }
+                            ]
+                        }
+                    ],
+                    "_leaf_tasks": [
+                        {
+                            "name": "concept",
+                            "task_type": "Concept",
+                            "assignees": []
+                        },
+                        {
+                            "name": "modeling",
+                            "task_type": "Modeling",
+                            "assignees": []
+                        },
+                        {
+                            "name": "rigging",
+                            "task_type": "Rigging", 
+                            "assignees": []
+                        },
+                        {
+                            "name": "texturing",
+                            "task_type": "Texturing",
+                            "assignees": []
+                        },
+                        {
+                            "name": "surfacing",
+                            "task_type": "Surfacing",
+                            "assignees": []
+                        }
+                    ]
+                },
+                {
+                    "name": "props",
+                    "_combine": 1,
+                    "_children_count": 30,
+                    "_children_naming": "cartoon_props",
+                    "_children": "gen_assets",
+                    "_leaf_products": [
+                        {
+                            "name": "modelMain", 
+                            "product_type": "model",
+                            "_task_link": "modeling",
+                            "_representations": [
+                                {
+                                    "name": "ma",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.ma"
+                                },
+                                {
+                                    "name": "fbx",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.fbx"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "textureMain", 
+                            "product_type": "texture",
+                            "_task_link": "texturing",
+                            "_representations": [
+                                {
+                                    "name": "psd",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.psd"
+                                }
+                            ]
+                        }
+                    ],
+                    "_leaf_tasks": [
+                        {
+                            "name": "concept",
+                            "task_type": "Concept",
+                            "assignees": []
+                        },
+                        {
+                            "name": "modeling",
+                            "task_type": "Modeling",
+                            "assignees": []
+                        },
+                        {
+                            "name": "texturing",
+                            "task_type": "Texturing",
+                            "assignees": []
+                        }
+                    ]
+                },
+                {
+                    "name": "backgrounds",
+                    "_combine": 2,
+                    "_children_count": 15,
+                    "_children_naming": "cartoon_locations",
+                    "_children": "gen_assets",
+                    "_leaf_products": [
+                        {
+                            "name": "bgPaintMain", 
+                            "product_type": "bgpaint",
+                            "_task_link": "background_painting",
+                            "_representations": [
+                                {
+                                    "name": "psd",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.psd"
+                                },
+                                {
+                                    "name": "png",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.png"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "bgLayoutMain", 
+                            "product_type": "bglayout",
+                            "_task_link": "layout",
+                            "_representations": [
+                                {
+                                    "name": "ma",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.ma"
+                                }
+                            ]
+                        }
+                    ],
+                    "_leaf_tasks": [
+                        {
+                            "name": "concept",
+                            "task_type": "Concept", 
+                            "assignees": []
+                        },
+                        {
+                            "name": "background_painting",
+                            "task_type": "Background Painting",
+                            "assignees": []
+                        },
+                        {
+                            "name": "layout",
+                            "task_type": "Layout",
+                            "assignees": []
+                        }
+                    ]
+                },
+                {
+                    "name": "fx",
+                    "_combine": 1,
+                    "_children_count": 12,
+                    "_children_naming": "fx_elements",
+                    "_children": "gen_assets",
+                    "_leaf_products": [
+                        {
+                            "name": "fxMain", 
+                            "product_type": "fx",
+                            "_task_link": "fx",
+                            "_representations": [
+                                {
+                                    "name": "ma",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.ma"
+                                },
+                                {
+                                    "name": "abc",
+                                    "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.abc"
+                                }
+                            ]
+                        }
+                    ],
+                    "_leaf_tasks": [
+                        {
+                            "name": "fx",
+                            "task_type": "FX",
+                            "assignees": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "season01",
+            "folder_type": "Season",
+            "_children_count": 22,
+            "_children": "gen_episodes",
+            "_leaf_products": [
+                {
+                    "name": "storyboardMain",
+                    "product_type": "storyboard",
+                    "_representations": [
+                        {
+                            "name": "pdf",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.pdf"
+                        },
+                        {
+                            "name": "psd",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.psd"
+                        }
+                    ]
+                },
+                {
+                    "name": "animaticMain",
+                    "product_type": "animatic",
+                    "_representations": [
+                        {
+                            "name": "mov",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.mov"
+                        },
+                        {
+                            "name": "xml",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.xml"
+                        }
+                    ]
+                },
+                {
+                    "name": "layoutMain",
+                    "product_type": "layout",
+                    "_representations": [
+                        {
+                            "name": "ma",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.ma"
+                        },
+                        {
+                            "name": "fbx",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.fbx"
+                        }
+                    ]
+                },
+                {
+                    "name": "animationMain",
+                    "product_type": "animation",
+                    "_representations": [
+                        {
+                            "name": "ma",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.ma"
+                        },
+                        {
+                            "name": "abc",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.abc"
+                        }
+                    ]
+                },
+                {
+                    "name": "renderMain",
+                    "product_type": "render",
+                    "_representations": [
+                        {
+                            "name": "exr",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.####.exr"
+                        },
+                        {
+                            "name": "png",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.####.png"
+                        }
+                    ]
+                },
+                {
+                    "name": "compMain",
+                    "product_type": "comp",
+                    "_representations": [
+                        {
+                            "name": "mov",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.mov"
+                        },
+                        {
+                            "name": "exr",
+                            "template": "{root[work]}/{project[name]}/{path}/{product[type]}/{product[name]}/v{version:>03d}/{folder[name]}_{product[name]}_v{version:>03d}.####.exr"
+                        }
+                    ]
+                }
+            ],
+            "_leaf_tasks": [
+                {
+                    "name": "storyboard",
+                    "task_type": "Storyboard",
+                    "assignees": []
+                },
+                {
+                    "name": "animatic",
+                    "task_type": "Animatic",
+                    "assignees": []
+                },
+                {
+                    "name": "layout",
+                    "task_type": "Layout",
+                    "assignees": []
+                },
+                {
+                    "name": "animation",
+                    "task_type": "Animation",
+                    "assignees": []
+                },
+                {
+                    "name": "lighting",
+                    "task_type": "Lighting",
+                    "assignees": []
+                },
+                {
+                    "name": "compositing",
+                    "task_type": "Compositing",
+                    "assignees": []
+                },
+                {
+                    "name": "fx",
+                    "task_type": "FX",
+                    "assignees": []
+                }
+            ]
+        }
+    ]
+}
