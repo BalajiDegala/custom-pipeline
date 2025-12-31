@@ -1,6 +1,8 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react'
 import { Icon } from '@ynput/ayon-react-components'
 import * as Styled from '../FlowPage.styled'
+import NodeSearchPopup from './NodeSearchPopup'
+import { nodeTemplates } from './NodeSearchPopup'
 
 interface Node {
   id: string
@@ -12,6 +14,7 @@ interface Node {
   label: string
   icon: string
   description: string
+  config?: any
 }
 
 interface Edge {
@@ -27,6 +30,7 @@ interface NodeGraphProps {
   onEdgesChange: (edges: Edge[]) => void
   projectName?: string
   onNodeDoubleClick?: (node: Node) => void
+  onNodeConfigChange?: (nodeId: string, config: any) => void
 }
 
 const NodeGraph: React.FC<NodeGraphProps> = ({
@@ -37,13 +41,15 @@ const NodeGraph: React.FC<NodeGraphProps> = ({
   onNodeDoubleClick,
 }: NodeGraphProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  
   const [nodes, setNodes] = useState<Node[]>(externalNodes.length > 0 ? externalNodes : [
     {
       id: 'project-1',
-      x: 50,
-      y: 50,
-      width: 140,
-      height: 80,
+      x: 100,
+      y: 200,
+      width: 180,
+      height: 100,
       type: 'project',
       label: 'Project',
       icon: 'folder_open',
@@ -58,34 +64,55 @@ const NodeGraph: React.FC<NodeGraphProps> = ({
   const [connectingMouse, setConnectingMouse] = useState<{ x: number; y: number } | null>(null)
   const [lastClickTime, setLastClickTime] = useState<number>(0)
   const [lastClickedNode, setLastClickedNode] = useState<string | null>(null)
+  
+  // Zoom and pan state
+  const [zoom, setZoom] = useState(1)
+  const [pan, setPan] = useState({ x: 0, y: 0 })
+  const [isPanning, setIsPanning] = useState(false)
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 })
+  
+  // Context menu / search popup
+  const [showNodeSearch, setShowNodeSearch] = useState(false)
+  const [nodeSearchPosition, setNodeSearchPosition] = useState({ x: 0, y: 0 })
+  const [canvasClickPosition, setCanvasClickPosition] = useState({ x: 0, y: 0 })
 
-  const nodeTemplates = [
-    { type: 'project', label: 'Project', icon: 'folder_open', description: 'Project root', configurable: false },
-    { type: 'folders', label: 'Folders', icon: 'folder', description: 'Asset/Shot folders', configurable: true },
-    { type: 'products', label: 'Products', icon: 'inventory_2', description: 'Published products', configurable: true },
-    { type: 'versions', label: 'Versions', icon: 'history', description: 'Product versions', configurable: true },
-    { type: 'tasks', label: 'Tasks', icon: 'task', description: 'Work tasks', configurable: false },
-    { type: 'representations', label: 'Representations', icon: 'description', description: 'File representations', configurable: false },
-    { type: 'results', label: 'Results', icon: 'table_chart', description: 'Execute query and show results', configurable: false },
-  ]
+  // Sync external nodes
+  useEffect(() => {
+    if (externalNodes.length > 0) {
+      setNodes(externalNodes)
+    }
+  }, [externalNodes])
 
-  const addNode = (nodeTemplate: any) => {
+  useEffect(() => {
+    setEdges(externalEdges)
+  }, [externalEdges])
+
+  const addNode = (nodeTemplate: any, position?: { x: number; y: number }) => {
     const newNode: Node = {
       id: `${nodeTemplate.type}-${Date.now()}`,
-      x: Math.random() * 300 + 100,
-      y: Math.random() * 200 + 100,
-      width: 140,
-      height: 80,
+      x: position?.x ?? Math.random() * 300 + 100,
+      y: position?.y ?? Math.random() * 200 + 100,
+      width: 180,
+      height: 100,
       type: nodeTemplate.type,
       label: nodeTemplate.label,
       icon: nodeTemplate.icon,
       description: nodeTemplate.description,
+      config: {},
     }
     
     const newNodes = [...nodes, newNode]
     setNodes(newNodes)
     onExternalNodesChange(newNodes)
   }
+
+  // Transform screen coordinates to canvas coordinates
+  const screenToCanvas = useCallback((screenX: number, screenY: number) => {
+    return {
+      x: (screenX - pan.x) / zoom,
+      y: (screenY - pan.y) / zoom
+    }
+  }, [pan, zoom])
 
   const drawCanvas = useCallback(() => {
     const canvas = canvasRef.current
@@ -94,9 +121,37 @@ const NodeGraph: React.FC<NodeGraphProps> = ({
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Clear canvas with light background
+    // Clear and fill background
     ctx.fillStyle = '#1a1a1a'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    // Apply zoom and pan transform
+    ctx.save()
+    ctx.translate(pan.x, pan.y)
+    ctx.scale(zoom, zoom)
+    
+    // Draw grid pattern
+    const gridSize = 50
+    ctx.strokeStyle = '#2a2a2a'
+    ctx.lineWidth = 1 / zoom
+    
+    const startX = Math.floor(-pan.x / zoom / gridSize) * gridSize
+    const startY = Math.floor(-pan.y / zoom / gridSize) * gridSize
+    const endX = startX + canvas.width / zoom + gridSize * 2
+    const endY = startY + canvas.height / zoom + gridSize * 2
+    
+    for (let x = startX; x < endX; x += gridSize) {
+      ctx.beginPath()
+      ctx.moveTo(x, startY)
+      ctx.lineTo(x, endY)
+      ctx.stroke()
+    }
+    for (let y = startY; y < endY; y += gridSize) {
+      ctx.beginPath()
+      ctx.moveTo(startX, y)
+      ctx.lineTo(endX, y)
+      ctx.stroke()
+    }
 
     // Draw edges
     ctx.strokeStyle = '#666666'
@@ -129,84 +184,113 @@ const NodeGraph: React.FC<NodeGraphProps> = ({
     })
 
     // Draw nodes
-  nodes.forEach((node: Node) => {
-      // Highlight node if it's the connection source
+    nodes.forEach((node: Node) => {
       const isConnectingSource = connecting === node.id
       const isSelected = selectedNode === node.id
+      const hasConfig = node.config && Object.keys(node.config).length > 0
       
-      // Node background - use solid colors instead of CSS variables
+      // Node background
       ctx.fillStyle = isConnectingSource ? '#FF5722' : (isSelected ? '#4CAF50' : '#2D2D2D')
       ctx.strokeStyle = isConnectingSource ? '#FF7043' : (isSelected ? '#66BB6A' : '#555555')
       ctx.lineWidth = isConnectingSource ? 3 : 2
       
-      // Draw rounded rectangle
       const radius = 8
       ctx.beginPath()
       ctx.roundRect(node.x, node.y, node.width, node.height, radius)
       ctx.fill()
       ctx.stroke()
 
-      // Draw icon area (top part)
+      // Header area
       ctx.fillStyle = isConnectingSource ? '#E64A19' : (isSelected ? '#388E3C' : '#1F1F1F')
       ctx.beginPath()
-      ctx.roundRect(node.x, node.y, node.width, 30, [radius, radius, 0, 0])
+      ctx.roundRect(node.x, node.y, node.width, 35, [radius, radius, 0, 0])
       ctx.fill()
 
-      // Draw text - Label
+      // Label
       ctx.fillStyle = '#FFFFFF'
       ctx.font = 'bold 14px Arial'
       ctx.textAlign = 'center'
-      ctx.fillText(node.label, node.x + node.width / 2, node.y + 20)
+      ctx.fillText(node.label, node.x + node.width / 2, node.y + 23)
       
-      // Draw text - Description
-      ctx.font = '12px Arial'
+      // Description
+      ctx.font = '11px Arial'
       ctx.fillStyle = '#CCCCCC'
-      ctx.fillText(node.description, node.x + node.width / 2, node.y + 45)
+      ctx.fillText(node.description, node.x + node.width / 2, node.y + 55)
       
-      // Draw text - Type
+      // Type badge
       ctx.font = 'bold 10px Arial'
       ctx.fillStyle = isConnectingSource ? '#FFAB91' : (isSelected ? '#81C784' : '#2196F3')
-      ctx.fillText(node.type.toUpperCase(), node.x + node.width / 2, node.y + 65)
+      ctx.fillText(node.type.toUpperCase(), node.x + node.width / 2, node.y + 75)
       
-      // Draw connection points
-      const pointSize = 6
+      // Config indicator (green checkmark if configured)
+      if (hasConfig && Object.values(node.config).some((v: any) => Array.isArray(v) ? v.length > 0 : !!v)) {
+        ctx.fillStyle = '#4CAF50'
+        ctx.beginPath()
+        ctx.arc(node.x + node.width - 15, node.y + 15, 6, 0, 2 * Math.PI)
+        ctx.fill()
+        ctx.fillStyle = '#FFF'
+        ctx.font = 'bold 8px Arial'
+        ctx.fillText('✓', node.x + node.width - 15, node.y + 18)
+      }
+      
+      // Connection points
+      const pointSize = 8
       const pointColor = isConnectingSource ? '#FFEB3B' : '#FF9800'
       
-      // Top connection point
       ctx.fillStyle = pointColor
       ctx.beginPath()
       ctx.arc(node.x + node.width / 2, node.y, pointSize / 2, 0, 2 * Math.PI)
       ctx.fill()
       
-      // Bottom connection point
       ctx.beginPath()
       ctx.arc(node.x + node.width / 2, node.y + node.height, pointSize / 2, 0, 2 * Math.PI)
       ctx.fill()
     })
 
-    // Draw connection preview line if connecting
+    // Connection preview line
     if (connecting && connectingMouse) {
       const sourceNode = nodes.find((n: Node) => n.id === connecting)
       if (sourceNode) {
+        const canvasPos = screenToCanvas(connectingMouse.x, connectingMouse.y)
         ctx.strokeStyle = '#FF5722'
         ctx.lineWidth = 3
         ctx.setLineDash([5, 5])
         ctx.beginPath()
         ctx.moveTo(sourceNode.x + sourceNode.width / 2, sourceNode.y + sourceNode.height)
-        ctx.lineTo(connectingMouse.x, connectingMouse.y)
+        ctx.lineTo(canvasPos.x, canvasPos.y)
         ctx.stroke()
         ctx.setLineDash([])
       }
     }
-  }, [nodes, edges, selectedNode, connecting, connectingMouse])
+    
+    ctx.restore()
+  }, [nodes, edges, selectedNode, connecting, connectingMouse, zoom, pan, screenToCanvas])
 
   useEffect(() => {
     drawCanvas()
   }, [drawCanvas])
 
-  const getNodeAtPosition = (x: number, y: number): Node | null => {
+  // Handle canvas resize
+  useEffect(() => {
+    const resizeCanvas = () => {
+      const canvas = canvasRef.current
+      const container = containerRef.current
+      if (canvas && container) {
+        canvas.width = container.clientWidth
+        canvas.height = container.clientHeight
+        drawCanvas()
+      }
+    }
+    
+    resizeCanvas()
+    window.addEventListener('resize', resizeCanvas)
+    return () => window.removeEventListener('resize', resizeCanvas)
+  }, [drawCanvas])
+
+  const getNodeAtPosition = (canvasX: number, canvasY: number): Node | null => {
     for (const node of nodes) {
-      if (x >= node.x && x <= node.x + node.width && y >= node.y && y <= node.y + node.height) {
+      if (canvasX >= node.x && canvasX <= node.x + node.width && 
+          canvasY >= node.y && canvasY <= node.y + node.height) {
         return node
       }
     }
@@ -218,28 +302,27 @@ const NodeGraph: React.FC<NodeGraphProps> = ({
     if (!canvas) return
 
     const rect = canvas.getBoundingClientRect()
-    
-    // Scale mouse coordinates to canvas coordinates
-    const scaleX = canvas.width / rect.width
-    const scaleY = canvas.height / rect.height
-    const x = (event.clientX - rect.left) * scaleX
-    const y = (event.clientY - rect.top) * scaleY
+    const screenX = event.clientX - rect.left
+    const screenY = event.clientY - rect.top
+    const { x, y } = screenToCanvas(screenX, screenY)
 
-    console.log('Mouse down at:', x, y, 'Scale:', scaleX, scaleY)
+    // Middle mouse button or Shift+drag for panning
+    if (event.button === 1 || (event.button === 0 && event.shiftKey)) {
+      setIsPanning(true)
+      setPanStart({ x: event.clientX - pan.x, y: event.clientY - pan.y })
+      event.preventDefault()
+      return
+    }
     
     const node = getNodeAtPosition(x, y)
     
     if (node) {
-      console.log('Node found:', node.label, 'at position:', node.x, node.y)
-      
-      // Check for double-click on configurable nodes
       const now = Date.now()
       const isDoubleClick = lastClickedNode === node.id && now - lastClickTime < 300
       
       if (isDoubleClick && onNodeDoubleClick) {
-        console.log('Double-click detected on node:', node.label, 'type:', node.type)
-        if (['folders', 'products', 'versions', 'results'].includes(node.type)) {
-          console.log('Triggering double-click handler')
+        const configurableTypes = ['folders', 'products', 'versions', 'tasks', 'departments', 'artists', 'columns', 'results']
+        if (configurableTypes.includes(node.type)) {
           onNodeDoubleClick(node)
           setLastClickTime(0)
           setLastClickedNode(null)
@@ -251,22 +334,17 @@ const NodeGraph: React.FC<NodeGraphProps> = ({
       setLastClickedNode(node.id)
       
       if (event.ctrlKey || event.metaKey) {
-        // Start connection
-        console.log('Starting connection from node:', node.label)
         setConnecting(node.id)
-        setConnectingMouse({ x, y })
+        setConnectingMouse({ x: screenX, y: screenY })
         setSelectedNode(node.id)
         event.preventDefault()
         return
       } else {
-        // Start dragging
-        console.log('Starting drag for node:', node.label)
         setDraggedNode(node.id)
         setDragOffset({ x: x - node.x, y: y - node.y })
         setSelectedNode(node.id)
       }
     } else {
-      console.log('No node found at position')
       setSelectedNode(null)
       setConnecting(null)
       setConnectingMouse(null)
@@ -277,22 +355,26 @@ const NodeGraph: React.FC<NodeGraphProps> = ({
     const canvas = canvasRef.current
     if (!canvas) return
 
+    if (isPanning) {
+      setPan({
+        x: event.clientX - panStart.x,
+        y: event.clientY - panStart.y
+      })
+      return
+    }
+
     const rect = canvas.getBoundingClientRect()
-    
-    // Scale mouse coordinates to canvas coordinates
-    const scaleX = canvas.width / rect.width
-    const scaleY = canvas.height / rect.height
-    const x = (event.clientX - rect.left) * scaleX
-    const y = (event.clientY - rect.top) * scaleY
+    const screenX = event.clientX - rect.left
+    const screenY = event.clientY - rect.top
 
     if (connecting) {
-      // Update only the preview endpoint (source is `connecting`)
-      setConnectingMouse({ x, y })
+      setConnectingMouse({ x: screenX, y: screenY })
       return
     }
 
     if (!draggedNode) return
 
+    const { x, y } = screenToCanvas(screenX, screenY)
     const newX = x - dragOffset.x
     const newY = y - dragOffset.y
 
@@ -304,26 +386,23 @@ const NodeGraph: React.FC<NodeGraphProps> = ({
   }
 
   const handleMouseUp = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    console.log('Mouse up event')
+    if (isPanning) {
+      setIsPanning(false)
+      return
+    }
     
     if (connecting) {
       const canvas = canvasRef.current
       if (!canvas) return
 
       const rect = canvas.getBoundingClientRect()
-      
-      // Scale mouse coordinates to canvas coordinates
-      const scaleX = canvas.width / rect.width
-      const scaleY = canvas.height / rect.height
-      const x = (event.clientX - rect.left) * scaleX
-      const y = (event.clientY - rect.top) * scaleY
+      const screenX = event.clientX - rect.left
+      const screenY = event.clientY - rect.top
+      const { x, y } = screenToCanvas(screenX, screenY)
 
-      console.log('Looking for target node at:', x, y)
       const targetNode = getNodeAtPosition(x, y)
       
       if (targetNode && targetNode.id !== connecting) {
-        console.log('Creating connection from', connecting, 'to', targetNode.id)
-        // Create edge
         const newEdge: Edge = {
           id: `edge-${Date.now()}`,
           source: connecting,
@@ -332,10 +411,6 @@ const NodeGraph: React.FC<NodeGraphProps> = ({
         const newEdges = [...edges, newEdge]
         setEdges(newEdges)
         onExternalEdgesChange(newEdges)
-        console.log('Connection created successfully!')
-        alert(`Connected ${nodes.find((n: Node) => n.id === connecting)?.label} to ${targetNode.label}`)
-      } else {
-        console.log('No valid target found or same node')
       }
       setConnecting(null)
       setConnectingMouse(null)
@@ -344,9 +419,43 @@ const NodeGraph: React.FC<NodeGraphProps> = ({
     setDraggedNode(null)
   }
 
+  const handleWheel = (event: React.WheelEvent<HTMLCanvasElement>) => {
+    event.preventDefault()
+    const delta = event.deltaY > 0 ? 0.9 : 1.1
+    const newZoom = Math.min(Math.max(zoom * delta, 0.2), 3)
+    
+    const canvas = canvasRef.current
+    if (canvas) {
+      const rect = canvas.getBoundingClientRect()
+      const mouseX = event.clientX - rect.left
+      const mouseY = event.clientY - rect.top
+      
+      const newPanX = mouseX - (mouseX - pan.x) * (newZoom / zoom)
+      const newPanY = mouseY - (mouseY - pan.y) * (newZoom / zoom)
+      
+      setPan({ x: newPanX, y: newPanY })
+    }
+    
+    setZoom(newZoom)
+  }
+
+  const handleContextMenu = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    event.preventDefault()
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const rect = canvas.getBoundingClientRect()
+    const screenX = event.clientX - rect.left
+    const screenY = event.clientY - rect.top
+    const canvasPos = screenToCanvas(screenX, screenY)
+    
+    setNodeSearchPosition({ x: event.clientX, y: event.clientY })
+    setCanvasClickPosition(canvasPos)
+    setShowNodeSearch(true)
+  }
+
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Delete' && selectedNode) {
-      // Delete selected node and its edges
       const newNodes = nodes.filter((n: Node) => n.id !== selectedNode)
       const newEdges = edges.filter((e: Edge) => e.source !== selectedNode && e.target !== selectedNode)
       
@@ -356,69 +465,84 @@ const NodeGraph: React.FC<NodeGraphProps> = ({
       onExternalEdgesChange(newEdges)
       setSelectedNode(null)
     }
+    
+    // Tab key to open node search
+    if (event.key === 'Tab') {
+      event.preventDefault()
+      const canvas = canvasRef.current
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect()
+        setNodeSearchPosition({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
+        setCanvasClickPosition(screenToCanvas(rect.width / 2, rect.height / 2))
+        setShowNodeSearch(true)
+      }
+    }
+    
+    // Reset zoom with 'r'
+    if (event.key === 'r' || event.key === 'R') {
+      setZoom(1)
+      setPan({ x: 0, y: 0 })
+    }
   }
 
-  return (
-    <>
-      <Styled.NodePalette>
-        <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', width: '100%' }}>
-          Node Palette - Click to add nodes:
-        </div>
-        {nodeTemplates.map((template) => (
-          <Styled.NodeButton
-            key={template.type}
-            onClick={() => addNode(template)}
-            title={template.description}
-          >
-            <Icon icon={template.icon} />
-            {template.label}
-          </Styled.NodeButton>
-        ))}
-        <div style={{ fontSize: '12px', color: 'var(--md-sys-color-on-surface-variant)', width: '100%', marginTop: '8px' }}>
-          {connecting 
-            ? `🔗 Connecting from ${nodes.find((n: Node) => n.id === connecting)?.label} - Click target node` 
-            : 'Double-click Folders/Products/Versions/Results to configure • Hold Ctrl+Click source then click target to connect • Delete to remove'}
-        </div>
-      </Styled.NodePalette>
+  const handleNodeSelect = (template: typeof nodeTemplates[0]) => {
+    addNode(template, canvasClickPosition)
+    setShowNodeSearch(false)
+  }
 
-      <Styled.GraphArea>
-        {connecting && (
-          <div style={{
-            position: 'absolute',
-            top: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            background: '#FF5722',
-            color: 'white',
-            padding: '12px 24px',
-            borderRadius: '8px',
-            fontWeight: 600,
-            zIndex: 1000,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.4)'
-          }}>
-            🔗 Connection Mode: Click on any node to connect to it
-          </div>
-        )}
-        <canvas
-          ref={canvasRef}
-          width={800}
-          height={600}
-          style={{
-            width: '100%',
-            height: '100%',
-            background: '#1a1a1a',
-            cursor: draggedNode ? 'grabbing' : connecting ? 'crosshair' : 'default',
-            border: '1px solid #555',
-            borderRadius: '8px'
-          }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onKeyDown={handleKeyDown}
-          tabIndex={0}
+  const resetView = () => {
+    setZoom(1)
+    setPan({ x: 0, y: 0 })
+  }
+
+  const zoomIn = () => setZoom(Math.min(zoom * 1.2, 3))
+  const zoomOut = () => setZoom(Math.max(zoom * 0.8, 0.2))
+
+  return (
+    <Styled.GraphArea ref={containerRef}>
+      {/* Zoom Controls */}
+      <Styled.ZoomControls>
+        <Styled.ZoomButton onClick={zoomIn} title="Zoom In">+</Styled.ZoomButton>
+        <Styled.ZoomLevel>{Math.round(zoom * 100)}%</Styled.ZoomLevel>
+        <Styled.ZoomButton onClick={zoomOut} title="Zoom Out">−</Styled.ZoomButton>
+        <Styled.ZoomButton onClick={resetView} title="Reset View (R)">⌂</Styled.ZoomButton>
+      </Styled.ZoomControls>
+      
+      {/* Help text */}
+      <Styled.HelpText>
+        Right-click or Tab: Add node • Ctrl+Click: Connect • Delete: Remove • Shift+Drag or Scroll: Pan/Zoom • R: Reset
+      </Styled.HelpText>
+
+      {connecting && (
+        <Styled.ConnectionBanner>
+          🔗 Click target node to connect from {nodes.find((n: Node) => n.id === connecting)?.label}
+        </Styled.ConnectionBanner>
+      )}
+      
+      <canvas
+        ref={canvasRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          cursor: isPanning ? 'grabbing' : draggedNode ? 'grabbing' : connecting ? 'crosshair' : 'default',
+        }}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onWheel={handleWheel}
+        onContextMenu={handleContextMenu}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+      />
+      
+      {showNodeSearch && (
+        <NodeSearchPopup
+          position={nodeSearchPosition}
+          onSelect={handleNodeSelect}
+          onClose={() => setShowNodeSearch(false)}
         />
-      </Styled.GraphArea>
-    </>
+      )}
+    </Styled.GraphArea>
   )
 }
 

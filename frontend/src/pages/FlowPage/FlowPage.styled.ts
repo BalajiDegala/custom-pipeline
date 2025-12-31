@@ -138,5 +138,89 @@ export const GraphArea = styled.div`
   flex: 1;
   position: relative;
   background-color: var(--md-sys-color-surface-container);
-  border-radius: 0 0 8px 8px;
+  border-radius: 8px;
+  overflow: hidden;
+`
+
+export const ZoomControls = styled.div`
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 8px;
+  padding: 4px;
+  z-index: 10;
+`
+
+export const ZoomButton = styled.button`
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--md-sys-color-on-surface);
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  
+  &:hover {
+    background: var(--md-sys-color-surface-container-highest);
+  }
+`
+
+export const ZoomLevel = styled.span`
+  min-width: 50px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--md-sys-color-on-surface-variant);
+`
+
+export const HelpText = styled.div`
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  padding: 8px 12px;
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--md-sys-color-on-surface-variant);
+  z-index: 10;
+`
+
+export const ConnectionBanner = styled.div`
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #FF5722;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+`
+
+export const Toolbar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface-container);
+`
+
+export const ToolbarDivider = styled.div`
+  width: 1px;
+  height: 24px;
+  background: var(--md-sys-color-outline-variant);
+  margin: 0 8px;
 `
