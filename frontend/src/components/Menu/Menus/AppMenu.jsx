@@ -65,6 +65,13 @@ export const AppMenu = ({ user, ...props }) => {
 
   const managerItems = [
     {
+      id: 'flow',
+      link: '/flow',
+      label: 'Flow Editor',
+      icon: 'schema',
+      shortcut: 'F+F',
+    },
+    {
       id: 'events',
       link: '/events',
       label: 'Event Viewer',

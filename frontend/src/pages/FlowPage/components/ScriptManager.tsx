@@ -184,6 +184,8 @@ const ScriptManager: React.FC<ScriptManagerProps> = ({
   const [selectedScript, setSelectedScript] = useState<string | null>(null)
   const [scriptName, setScriptName] = useState('')
   const [scriptDescription, setScriptDescription] = useState('')
+  const [editingScriptId, setEditingScriptId] = useState<string | null>(null)
+  const [nameError, setNameError] = useState<string | null>(null)
 
   useEffect(() => {
     loadScripts()
@@ -194,7 +196,6 @@ const ScriptManager: React.FC<ScriptManagerProps> = ({
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
         const allScripts = JSON.parse(stored)
-        // Filter by project if needed, or show all
         setScripts(allScripts)
       }
     } catch (error) {
@@ -202,28 +203,85 @@ const ScriptManager: React.FC<ScriptManagerProps> = ({
     }
   }
 
+  // Check if name already exists (excluding current script if editing)
+  const isNameDuplicate = (name: string): boolean => {
+    const normalizedName = name.trim().toLowerCase()
+    return scripts.some(s => 
+      s.name.toLowerCase() === normalizedName && 
+      s.id !== editingScriptId
+    )
+  }
+
+  // Generate unique name suggestion
+  const suggestUniqueName = (baseName: string): string => {
+    let counter = 1
+    let suggestedName = baseName
+    while (isNameDuplicate(suggestedName)) {
+      suggestedName = `${baseName} (${counter})`
+      counter++
+    }
+    return suggestedName
+  }
+
+  const handleNameChange = (name: string) => {
+    setScriptName(name)
+    if (isNameDuplicate(name)) {
+      const suggested = suggestUniqueName(name)
+      setNameError(`Name already exists. Suggestion: "${suggested}"`)
+    } else {
+      setNameError(null)
+    }
+  }
+
   const saveScript = () => {
     if (!scriptName.trim()) {
-      alert('Please enter a script name')
+      setNameError('Please enter a script name')
       return
     }
 
-    const newScript: FlowScript = {
-      id: `script-${Date.now()}`,
-      name: scriptName.trim(),
-      description: scriptDescription.trim(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      nodes: nodes,
-      edges: edges
+    if (isNameDuplicate(scriptName)) {
+      const suggested = suggestUniqueName(scriptName)
+      setNameError(`Name already exists. Use "${suggested}" instead?`)
+      return
     }
 
-    const updatedScripts = [...scripts, newScript]
-    setScripts(updatedScripts)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedScripts))
+    if (editingScriptId) {
+      // Update existing script
+      const updatedScripts = scripts.map(s => 
+        s.id === editingScriptId 
+          ? { ...s, name: scriptName.trim(), description: scriptDescription.trim(), updatedAt: new Date().toISOString(), nodes, edges }
+          : s
+      )
+      setScripts(updatedScripts)
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedScripts))
+      alert(`Script "${scriptName}" updated successfully!`)
+    } else {
+      // Create new script
+      const newScript: FlowScript = {
+        id: `script-${Date.now()}`,
+        name: scriptName.trim(),
+        description: scriptDescription.trim(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        nodes: nodes,
+        edges: edges
+      }
+
+      const updatedScripts = [...scripts, newScript]
+      setScripts(updatedScripts)
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedScripts))
+      alert(`Script "${scriptName}" saved successfully!`)
+    }
     
-    alert(`Script "${scriptName}" saved successfully!`)
     onClose()
+  }
+
+  const openScriptForEditing = (script: FlowScript) => {
+    setEditingScriptId(script.id)
+    setScriptName(script.name)
+    setScriptDescription(script.description)
+    setTab('save')
+    onLoad(script.nodes, script.edges)
   }
 
   const loadScript = () => {
@@ -307,13 +365,40 @@ const ScriptManager: React.FC<ScriptManagerProps> = ({
           {tab === 'save' ? (
             <>
               <FormGroup>
-                <Label>Script Name *</Label>
+                <Label>Script Name * {editingScriptId && <span style={{ color: 'var(--md-sys-color-primary)', fontSize: '12px' }}>(Editing)</span>}</Label>
                 <InputText
                   value={scriptName}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setScriptName(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleNameChange(e.target.value)}
                   placeholder="Enter a name for this flow..."
-                  style={{ width: '100%' }}
+                  style={{ width: '100%', borderColor: nameError ? 'var(--md-sys-color-error)' : undefined }}
                 />
+                {nameError && (
+                  <div style={{ 
+                    color: 'var(--md-sys-color-error)', 
+                    fontSize: '12px', 
+                    marginTop: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <span>{nameError}</span>
+                    {nameError.includes('Suggestion') && (
+                      <Button 
+                        variant="text" 
+                        onClick={() => {
+                          const match = nameError.match(/"([^"]+)"/)
+                          if (match) {
+                            setScriptName(match[1])
+                            setNameError(null)
+                          }
+                        }}
+                        style={{ padding: '2px 8px', fontSize: '11px' }}
+                      >
+                        Use suggestion
+                      </Button>
+                    )}
+                  </div>
+                )}
               </FormGroup>
               
               <FormGroup>
@@ -335,8 +420,24 @@ const ScriptManager: React.FC<ScriptManagerProps> = ({
                   color: 'var(--md-sys-color-on-surface-variant)'
                 }}>
                   {nodes.length} nodes, {edges.length} connections
+                  {editingScriptId && <span style={{ marginLeft: '8px', color: 'var(--md-sys-color-primary)' }}>• Editing existing script</span>}
                 </div>
               </FormGroup>
+              
+              {editingScriptId && (
+                <Button 
+                  variant="text" 
+                  onClick={() => {
+                    setEditingScriptId(null)
+                    setScriptName('')
+                    setScriptDescription('')
+                    setNameError(null)
+                  }}
+                  style={{ marginTop: '8px' }}
+                >
+                  <Icon icon="add" /> Save as New Script Instead
+                </Button>
+              )}
             </>
           ) : (
             <>
@@ -345,9 +446,17 @@ const ScriptManager: React.FC<ScriptManagerProps> = ({
                   <Icon icon="upload" /> Import JSON
                 </Button>
                 {selectedScript && (
-                  <Button onClick={exportScript} variant="text">
-                    <Icon icon="download" /> Export Selected
-                  </Button>
+                  <>
+                    <Button onClick={exportScript} variant="text">
+                      <Icon icon="download" /> Export
+                    </Button>
+                    <Button onClick={() => {
+                      const script = scripts.find(s => s.id === selectedScript)
+                      if (script) openScriptForEditing(script)
+                    }} variant="text">
+                      <Icon icon="edit" /> Edit
+                    </Button>
+                  </>
                 )}
               </div>
               
@@ -372,13 +481,24 @@ const ScriptManager: React.FC<ScriptManagerProps> = ({
                           {script.nodes.length} nodes
                         </div>
                       </ScriptInfo>
-                      <Button 
-                        variant="text" 
-                        onClick={(e) => deleteScript(script.id, e)}
-                        style={{ padding: '4px' }}
-                      >
-                        <Icon icon="delete" />
-                      </Button>
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        <Button 
+                          variant="text" 
+                          onClick={(e) => { e.stopPropagation(); openScriptForEditing(script) }}
+                          style={{ padding: '4px' }}
+                          title="Edit script"
+                        >
+                          <Icon icon="edit" />
+                        </Button>
+                        <Button 
+                          variant="text" 
+                          onClick={(e) => deleteScript(script.id, e)}
+                          style={{ padding: '4px' }}
+                          title="Delete script"
+                        >
+                          <Icon icon="delete" />
+                        </Button>
+                      </div>
                     </ScriptItem>
                   ))}
                 </ScriptList>
@@ -390,8 +510,8 @@ const ScriptManager: React.FC<ScriptManagerProps> = ({
         <Footer>
           <Button variant="text" onClick={onClose}>Cancel</Button>
           {tab === 'save' ? (
-            <Button onClick={saveScript} disabled={!scriptName.trim()}>
-              <Icon icon="save" /> Save Script
+            <Button onClick={saveScript} disabled={!scriptName.trim() || !!nameError}>
+              <Icon icon="save" /> {editingScriptId ? 'Update Script' : 'Save Script'}
             </Button>
           ) : (
             <Button onClick={loadScript} disabled={!selectedScript}>

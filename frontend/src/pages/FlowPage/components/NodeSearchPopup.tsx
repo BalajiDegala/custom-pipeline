@@ -106,7 +106,6 @@ export const nodeTemplates: NodeTemplate[] = [
   { type: 'representations', label: 'Representations', icon: 'description', description: 'File representations', configurable: false },
   { type: 'departments', label: 'Departments', icon: 'groups', description: 'Department filter', configurable: true },
   { type: 'artists', label: 'Artists', icon: 'person', description: 'Artist/User filter', configurable: true },
-  { type: 'columns', label: 'Columns', icon: 'view_column', description: 'Select output columns', configurable: true },
   { type: 'results', label: 'Results', icon: 'table_chart', description: 'Execute query', configurable: false },
 ]
 

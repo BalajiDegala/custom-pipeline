@@ -111,21 +111,31 @@ const SelectAllRow = styled.div`
   color: var(--md-sys-color-on-surface-variant);
 `
 
+interface FlowNode {
+  id: string
+  type: string
+  label: string
+  config?: any
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+interface FlowEdge {
+  id: string
+  source: string
+  target: string
+}
+
 interface InlineNodeConfigProps {
-  node: {
-    id: string
-    type: string
-    label: string
-    config?: any
-    x: number
-    y: number
-    width: number
-    height: number
-  }
+  node: FlowNode
   projectName: string
   position: { x: number; y: number }
   onClose: () => void
   onSave: (nodeId: string, config: any) => void
+  nodes?: FlowNode[]
+  edges?: FlowEdge[]
 }
 
 const InlineNodeConfig: React.FC<InlineNodeConfigProps> = ({
@@ -133,12 +143,52 @@ const InlineNodeConfig: React.FC<InlineNodeConfigProps> = ({
   projectName,
   position,
   onClose,
-  onSave
+  onSave,
+  nodes = [],
+  edges = []
 }) => {
   const [search, setSearch] = useState('')
   const [options, setOptions] = useState<any[]>([])
   const [selected, setSelected] = useState<string[]>(node.config?.selectedItems || [])
   const [loading, setLoading] = useState(true)
+
+  // Get upstream node selections for cascading filters
+  const getUpstreamContext = () => {
+    const context: {
+      selectedDepartments?: string[]
+      selectedArtists?: string[]
+      selectedFolders?: string[]
+      selectedTasks?: string[]
+    } = {}
+    
+    // Find all nodes connected upstream of this node
+    const findUpstream = (nodeId: string): FlowNode[] => {
+      const incomingEdge = edges.find(e => e.target === nodeId)
+      if (!incomingEdge) return []
+      const sourceNode = nodes.find(n => n.id === incomingEdge.source)
+      if (!sourceNode) return []
+      return [sourceNode, ...findUpstream(sourceNode.id)]
+    }
+    
+    const upstreamNodes = findUpstream(node.id)
+    
+    upstreamNodes.forEach(n => {
+      if (n.type === 'departments' && n.config?.selectedDepartments?.length > 0) {
+        context.selectedDepartments = n.config.selectedDepartments
+      }
+      if (n.type === 'artists' && n.config?.selectedArtists?.length > 0) {
+        context.selectedArtists = n.config.selectedArtists
+      }
+      if (n.type === 'folders' && n.config?.selectedFolders?.length > 0) {
+        context.selectedFolders = n.config.selectedFolders
+      }
+      if (n.type === 'tasks' && n.config?.selectedTasks?.length > 0) {
+        context.selectedTasks = n.config.selectedTasks
+      }
+    })
+    
+    return context
+  }
 
   useEffect(() => {
     fetchOptions()
@@ -154,6 +204,7 @@ const InlineNodeConfig: React.FC<InlineNodeConfigProps> = ({
 
   const getConfigKey = (type: string): string => {
     switch (type) {
+      case 'project': return 'selectedProjects'
       case 'folders': return 'selectedFolders'
       case 'products': return 'selectedProducts'
       case 'versions': return 'selectedVersions'
@@ -168,7 +219,8 @@ const InlineNodeConfig: React.FC<InlineNodeConfigProps> = ({
   const fetchOptions = async () => {
     setLoading(true)
     try {
-      const query = buildQuery(node.type)
+      const upstreamContext = getUpstreamContext()
+      const query = buildQuery(node.type, upstreamContext)
       const accessToken = localStorage.getItem('accessToken')
       const headers: Record<string, string> = { 'Content-Type': 'application/json' }
       if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`
@@ -180,7 +232,7 @@ const InlineNodeConfig: React.FC<InlineNodeConfigProps> = ({
       })
       
       const data = await response.json()
-      const extractedOptions = extractOptions(data, node.type)
+      const extractedOptions = extractOptions(data, node.type, upstreamContext)
       setOptions(extractedOptions)
     } catch (error) {
       console.error('Failed to fetch options:', error)
@@ -189,12 +241,18 @@ const InlineNodeConfig: React.FC<InlineNodeConfigProps> = ({
     }
   }
 
-  const buildQuery = (type: string): string => {
+  const buildQuery = (type: string, context: ReturnType<typeof getUpstreamContext>): string => {
     switch (type) {
+      case 'project':
+        return `query GetProjects {
+          projects(first: 100) {
+            edges { node { name code active } }
+          }
+        }`
       case 'folders':
         return `query GetFolders($projectName: String!) {
           project(name: $projectName) {
-            folders(first: 200) {
+            folders(first: 2000) {
               edges { node { id name folderType path } }
             }
           }
@@ -202,7 +260,7 @@ const InlineNodeConfig: React.FC<InlineNodeConfigProps> = ({
       case 'products':
         return `query GetProducts($projectName: String!) {
           project(name: $projectName) {
-            products(first: 200) {
+            products(first: 2000) {
               edges { node { id name productType } }
             }
           }
@@ -210,30 +268,32 @@ const InlineNodeConfig: React.FC<InlineNodeConfigProps> = ({
       case 'versions':
         return `query GetVersions($projectName: String!) {
           project(name: $projectName) {
-            versions(first: 200) {
+            versions(first: 2000) {
               edges { node { id version author } }
             }
           }
         }`
       case 'tasks':
+        // Tasks query with optional filters
         return `query GetTasks($projectName: String!) {
           project(name: $projectName) {
-            tasks(first: 200) {
-              edges { node { id name taskType status } }
+            tasks(first: 2000) {
+              edges { node { id name taskType status assignees } }
             }
           }
         }`
       case 'artists':
-        return `query GetUsers {
-          users(first: 200) {
-            edges { node { name fullName } }
+        // Query users with projectName to filter by project access (avoids permission issues)
+        return `query GetUsers($projectName: String!) {
+          users(projectName: $projectName, first: 2000) {
+            edges { node { name attrib { fullName } } }
           }
         }`
       case 'departments':
         // Departments are typically task types or custom attribute
         return `query GetTaskTypes($projectName: String!) {
           project(name: $projectName) {
-            tasks(first: 200) {
+            tasks(first: 2000) {
               edges { node { taskType } }
             }
           }
@@ -246,9 +306,15 @@ const InlineNodeConfig: React.FC<InlineNodeConfigProps> = ({
     }
   }
 
-  const extractOptions = (data: any, type: string): any[] => {
+  const extractOptions = (data: any, type: string, context: ReturnType<typeof getUpstreamContext>): any[] => {
     try {
       switch (type) {
+        case 'project':
+          return data?.data?.projects?.edges?.map((e: any) => ({
+            id: e.node.name,
+            name: e.node.name,
+            meta: e.node.active ? `${e.node.code} • Active` : `${e.node.code} • Inactive`
+          })) || []
         case 'folders':
           return data?.data?.project?.folders?.edges?.map((e: any) => ({
             id: e.node.id,
@@ -267,24 +333,49 @@ const InlineNodeConfig: React.FC<InlineNodeConfigProps> = ({
             name: `v${e.node.version}`,
             meta: e.node.author
           })) || []
-        case 'tasks':
-          return data?.data?.project?.tasks?.edges?.map((e: any) => ({
+        case 'tasks': {
+          let tasks = data?.data?.project?.tasks?.edges?.map((e: any) => ({
             id: e.node.id,
             name: e.node.name,
+            taskType: e.node.taskType,
+            status: e.node.status,
+            assignees: e.node.assignees || [],
             meta: `${e.node.taskType} • ${e.node.status}`
           })) || []
-        case 'artists':
-          return data?.data?.users?.edges?.map((e: any) => ({
+          
+          // Filter by departments (task types) if selected upstream
+          if (context.selectedDepartments?.length) {
+            tasks = tasks.filter((t: any) => context.selectedDepartments!.includes(t.taskType))
+          }
+          
+          // Filter by artists (assignees) if selected upstream
+          if (context.selectedArtists?.length) {
+            tasks = tasks.filter((t: any) => 
+              t.assignees.some((a: string) => context.selectedArtists!.includes(a))
+            )
+          }
+          
+          return tasks
+        }
+        case 'artists': {
+          let users = data?.data?.users?.edges?.map((e: any) => ({
             id: e.node.name,
-            name: e.node.fullName || e.node.name,
+            name: e.node.attrib?.fullName || e.node.name,
             meta: 'User'
           })) || []
-        case 'departments':
+          
+          // If departments are selected upstream, we could filter users by tasks they're assigned to
+          // This would require an additional query, so for now we show all users
+          
+          return users
+        }
+        case 'departments': {
           const taskTypes = new Set<string>()
           data?.data?.project?.tasks?.edges?.forEach((e: any) => {
             if (e.node.taskType) taskTypes.add(e.node.taskType)
           })
           return Array.from(taskTypes).map(t => ({ id: t, name: t, meta: 'Task Type' }))
+        }
         case 'columns':
           return [
             { id: 'id', name: 'ID', meta: 'Entity ID' },
@@ -322,6 +413,12 @@ const InlineNodeConfig: React.FC<InlineNodeConfigProps> = ({
 
   const selectAll = () => setSelected(filteredOptions.map(o => o.id))
   const clearAll = () => setSelected([])
+  
+  // Select only active projects (for project node)
+  const selectAllActive = () => {
+    const activeProjects = options.filter(o => o.meta?.includes('Active'))
+    setSelected(activeProjects.map(o => o.id))
+  }
 
   const handleSave = () => {
     const configKey = getConfigKey(node.type)
@@ -362,6 +459,11 @@ const InlineNodeConfig: React.FC<InlineNodeConfigProps> = ({
           <SelectAllRow>
             <span>{selected.length} of {options.length} selected</span>
             <div>
+              {node.type === 'project' && (
+                <Button variant="text" onClick={selectAllActive} style={{ padding: '4px 8px', fontSize: '12px' }}>
+                  Active
+                </Button>
+              )}
               <Button variant="text" onClick={selectAll} style={{ padding: '4px 8px', fontSize: '12px' }}>
                 All
               </Button>

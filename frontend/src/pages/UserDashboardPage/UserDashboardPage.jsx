@@ -22,6 +22,7 @@ import DocumentTitle from '@components/DocumentTitle/DocumentTitle'
 import useTitle from '@hooks/useTitle'
 import HelpButton from '@components/HelpButton/HelpButton'
 import { UserDashboardProvider } from './context/UserDashboardContext'
+import FlowPage from '@pages/FlowPage/FlowPage'
 
 const StyledSplitter = styled(Splitter)`
   height: 100%;
@@ -59,6 +60,12 @@ const UserDashboardPage = () => {
       name: 'Overview',
       path: '/dashboard/overview',
       module: 'overview',
+      accessLevels: [],
+    },
+    {
+      name: 'Flow',
+      path: '/dashboard/flow',
+      module: 'flow',
       accessLevels: [],
     },
   ]
@@ -135,8 +142,8 @@ const UserDashboardPage = () => {
     await updateProject({ projectName: sel, projectPatchModel: { active } }).unwrap()
   }
 
-  const isProjectsMultiSelect = module === 'tasks'
-  const showProjectList = module === 'tasks' || module === 'overview'
+  const isProjectsMultiSelect = module === 'tasks' || module === 'flow'
+  const showProjectList = module === 'tasks' || module === 'overview' || module === 'flow'
 
   if (isLoadingProjects) return null
 
@@ -157,6 +164,9 @@ const UserDashboardPage = () => {
         break
       case 'overview':
         moduleComponent = <ProjectDashboard projectName={selectedProjects[0]} />
+        break
+      case 'flow':
+        moduleComponent = <FlowPage projectName={selectedProjects[0]} selectedProjects={selectedProjects} />
         break
       default:
         moduleComponent = (

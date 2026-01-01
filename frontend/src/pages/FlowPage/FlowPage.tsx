@@ -27,9 +27,10 @@ interface Edge {
 
 interface FlowPageProps {
   projectName?: string
+  selectedProjects?: string[]
 }
 
-const FlowPage: React.FC<FlowPageProps> = ({ projectName }) => {
+const FlowPage: React.FC<FlowPageProps> = ({ projectName, selectedProjects = [] }) => {
   const [nodes, setNodes] = useState<Node[]>([])
   const [edges, setEdges] = useState<Edge[]>([])
   const [configNode, setConfigNode] = useState<Node | null>(null)
@@ -55,7 +56,7 @@ const FlowPage: React.FC<FlowPageProps> = ({ projectName }) => {
     }
     
     // Handle configurable nodes with inline config
-    const configurableTypes = ['folders', 'products', 'versions', 'tasks', 'departments', 'artists', 'columns']
+    const configurableTypes = ['project', 'folders', 'products', 'versions', 'tasks', 'departments', 'artists', 'columns']
     if (configurableTypes.includes(node.type)) {
       const nodeWithConfig = nodes.find(n => n.id === node.id) || node
       // Position config panel near the node
@@ -65,6 +66,32 @@ const FlowPage: React.FC<FlowPageProps> = ({ projectName }) => {
       })
       setConfigNode(nodeWithConfig as Node)
     }
+  }
+
+  // Get the selected project from the Project node or from props
+  const getSelectedProject = (): string => {
+    const projectNode = nodes.find(n => n.type === 'project')
+    const nodeSelectedProjects = projectNode?.config?.selectedProjects || []
+    if (nodeSelectedProjects.length > 0) {
+      return nodeSelectedProjects[0] // Use first selected project from node
+    }
+    if (selectedProjects.length > 0) {
+      return selectedProjects[0] // Use first from props
+    }
+    return projectName || 'demo_Commercial' // Fallback
+  }
+  
+  // Get all selected projects (for multi-project queries)
+  const getAllSelectedProjects = (): string[] => {
+    const projectNode = nodes.find(n => n.type === 'project')
+    const nodeSelectedProjects = projectNode?.config?.selectedProjects || []
+    if (nodeSelectedProjects.length > 0) {
+      return nodeSelectedProjects
+    }
+    if (selectedProjects.length > 0) {
+      return selectedProjects
+    }
+    return projectName ? [projectName] : ['demo_Commercial']
   }
 
   const handleConfigSave = (nodeId: string, config: any) => {
@@ -126,7 +153,7 @@ const FlowPage: React.FC<FlowPageProps> = ({ projectName }) => {
             onEdgesChange={handleEdgesChange}
             onNodeDoubleClick={handleNodeDoubleClick}
             onNodeConfigChange={handleConfigSave}
-            projectName={projectName}
+            projectName={getSelectedProject()}
           />
         </Panel>
         
@@ -134,10 +161,12 @@ const FlowPage: React.FC<FlowPageProps> = ({ projectName }) => {
         {configNode && (
           <InlineNodeConfig
             node={configNode}
-            projectName={projectName || 'demo_Commercial'}
+            projectName={getSelectedProject()}
             position={configPosition}
             onClose={() => setConfigNode(null)}
             onSave={handleConfigSave}
+            nodes={nodes}
+            edges={edges}
           />
         )}
         
@@ -147,7 +176,8 @@ const FlowPage: React.FC<FlowPageProps> = ({ projectName }) => {
             resultsNodeId={activeResultsNode}
             nodes={nodes}
             edges={edges}
-            projectName={projectName || 'demo_Commercial'}
+            projectName={getSelectedProject()}
+            allProjects={getAllSelectedProjects()}
             onClose={() => setActiveResultsNode(null)}
           />
         )}
@@ -157,7 +187,7 @@ const FlowPage: React.FC<FlowPageProps> = ({ projectName }) => {
           <ScriptManager
             nodes={nodes}
             edges={edges}
-            projectName={projectName || 'demo_Commercial'}
+            projectName={getSelectedProject()}
             onLoad={handleLoadScript}
             onClose={() => setShowScriptManager(false)}
           />

@@ -16,6 +16,7 @@ import { toast } from 'react-toastify'
 
 import ColumnsWrapper from './ColumnsWrapper'
 import DashboardTasksToolbar from './DashboardTasksToolbar/DashboardTasksToolbar'
+import BulkEditToolbar from './BulkEditToolbar/BulkEditToolbar'
 import {
   onCollapsedColumnsChanged,
   onDraggingEnd,
@@ -25,6 +26,7 @@ import {
 import KanBanCardOverlay from './KanBanCard/KanBanCardOverlay'
 import { StringParam, useQueryParam, withDefault } from 'use-query-params'
 import UserDashboardList from './UserDashboardList/UserDashboardList'
+import NestedDashboardList from './UserDashboardList/NestedDashboardList'
 
 const UserDashboardKanBan = ({
   tasks,
@@ -76,8 +78,9 @@ const UserDashboardKanBan = ({
 
   // SORT BY
   const sortByValue = useSelector((state) => state.dashboard.tasks.sortBy)
-  // GROUP BY
-  const groupByValue = useSelector((state) => state.dashboard.tasks.groupBy)
+  // GROUP BY - ensure it's always an array
+  const groupByValueRaw = useSelector((state) => state.dashboard.tasks.groupBy)
+  const groupByValue = Array.isArray(groupByValueRaw) ? groupByValueRaw : []
 
   // FILTER
   const filterValue = useSelector((state) => state.dashboard.tasks.filter)
@@ -283,10 +286,25 @@ const UserDashboardKanBan = ({
     updateEntities({ operations, entityType: 'task' })
   }
 
+  // Function to clear task selection
+  const handleClearSelection = () => {
+    dispatch(onTaskSelected({ ids: [], types: [], data: [] }))
+  }
+
   return (
     <>
       <Section style={{ height: '100%', zIndex: 10, padding: 0, overflow: 'hidden' }}>
-        <DashboardTasksToolbar {...{ view, setView, isLoadingProjectUsers }} />
+        <DashboardTasksToolbar {...{ view, setView, isLoadingProjectUsers, tasks: sortedTasks, projectsInfo }} />
+        
+        {/* Bulk Edit Toolbar - appears when 2+ tasks selected */}
+        <BulkEditToolbar
+          selectedTasks={selectedTasks}
+          tasks={tasks}
+          statusesOptions={statusesOptions}
+          priorities={priorities}
+          projectUsers={projectUsers}
+          onClearSelection={handleClearSelection}
+        />
         {view === 'kanban' && (
           <DndContext
             sensors={sensors}
@@ -314,7 +332,20 @@ const UserDashboardKanBan = ({
             />
           </DndContext>
         )}
-        {view === 'list' && (
+        {view === 'list' && groupByValue.length > 1 && (
+          <NestedDashboardList
+            tasks={sortedTasks}
+            groupByValue={groupByValue}
+            isLoading={isLoading}
+            allUsers={projectUsers}
+            statusesOptions={statusesOptions}
+            disabledStatuses={disabledStatuses}
+            disabledProjectUsers={disabledProjectUsers}
+            projectsInfo={projectsInfo}
+            priorities={priorities}
+          />
+        )}
+        {view === 'list' && groupByValue.length <= 1 && (
           <UserDashboardList
             groupedFields={fieldsColumns.length ? fieldsColumns : [{ id: 'none' }]}
             groupedTasks={tasksColumns}

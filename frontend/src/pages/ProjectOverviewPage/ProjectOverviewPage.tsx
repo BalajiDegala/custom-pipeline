@@ -28,6 +28,7 @@ import ProjectOverviewSettings from './containers/ProjectOverviewSettings'
 import { useSettingsPanel } from '@shared/context'
 import ReloadButton from './components/ReloadButton'
 import OverviewActions from './components/OverviewActions'
+import CSVImportExport from './components/CSVImportExport'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAppSelector } from '@state/store'
 import { DetailsPanelEntityData, OperationResponseModel } from '@shared/api'
@@ -150,6 +151,7 @@ const ProjectOverviewPage: FC = () => {
             <Toolbar>
               <NewEntity disabled={!showHierarchy} onNewEntities={handleNewEntities} />
               <OverviewActions />
+              <CSVImportExport projectName={projectName || ''} />
               <SearchFilterWrapper
                 queryFilters={displayFilters}
                 onChange={handleFiltersChange}

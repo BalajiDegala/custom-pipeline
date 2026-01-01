@@ -15,6 +15,7 @@ const EventsPage = lazy(() => import('@pages/EventsPage'))
 const ServicesPage = lazy(() => import('@pages/ServicesPage'))
 const UserDashboardPage = lazy(() => import('@pages/UserDashboardPage'))
 const ErrorPage = lazy(() => import('@pages/ErrorPage'))
+const FlowPage = lazy(() => import('@pages/FlowPage/FlowPage'))
 
 import { useLoadRemotePages } from '../remote/useLoadRemotePages'
 
@@ -131,6 +132,16 @@ const AppRoutes: FC<AppRoutesProps> = () => {
         element={
           <ProtectedRoute isAllowed={level >= 700} redirectPath="/">
             <MarketPage />
+          </ProtectedRoute>
+        }
+      />
+      
+      {/* Flow Page - Top-level visual pipeline query builder */}
+      <Route
+        path="/flow"
+        element={
+          <ProtectedRoute isAllowed={level >= 500} redirectPath="/">
+            <FlowPage />
           </ProtectedRoute>
         }
       />
