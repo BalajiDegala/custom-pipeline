@@ -23,45 +23,48 @@ Build a comprehensive visual production management tool for VFX/Animation studio
 ## Phase 2: Data Editing (In Progress)
 - [x] Inline cell editing in table view
 - [x] REST API PATCH calls for updates
-- [ ] Bulk editing (select multiple rows, edit same field)
-- [ ] Status change dropdown with predefined options
-- [ ] Assignee picker with user search
-- [ ] Date picker for deadline fields
-- [ ] Undo/Redo for edits
-- [ ] Edit history log
+- [x] Bulk editing (select multiple rows, edit same field)
+- [x] Status change dropdown with predefined options
+- [x] Assignee picker with user search
+- [x] Date picker for deadline fields
+- [x] Undo/Redo for edits
+- [x] Edit history log
+- [x] Search/filter results
 
-## Phase 3: Task Creation
-- [ ] "Create Task" node type
+## Phase 3: Entity Creation
+- [ ] Create new folder (from Results page)
+- [ ] Folder type selection
+- [ ] Folder hierarchy creation (nested folders)
+- [ ] Create task under folder
+- [ ] Task type selection (Animation, Lighting, Comp, etc.)
+- [ ] Batch task creation (multiple tasks at once)
 - [ ] Task template system
-- [ ] Batch task creation from folder selection
 - [ ] Task duplication
-- [ ] Task type presets (Animation, Lighting, Comp, etc.)
 - [ ] Auto-assignment rules
 
 ## Phase 4: Scheduling
-- [ ] Timeline view node
-- [ ] Gantt chart visualization
-- [ ] Drag-to-schedule tasks
-- [ ] Dependencies between tasks
-- [ ] Milestone markers
-- [ ] Workload balancing view (per artist)
-- [ ] Calendar integration
+- [x] Timeline view node
+- [x] Gantt chart visualization
+- [x] Drag-to-schedule tasks
+- [x] Dependencies between tasks
+- [x] Milestone markers
+- [x] Workload balancing view (per artist)
+- [x] Calendar integration
 
 ## Phase 5: Production Setup
-- [ ] Project creation wizard
-- [ ] Asset/Shot structure templates
-- [ ] Import from spreadsheet (CSV/Excel)
-- [ ] Folder hierarchy generator
-- [ ] Task template application
-- [ ] Team assignment
+- [ ] Project creation wizard (requires backend API)
+- [ ] Asset/Shot structure templates (requires backend API)
+- [x] Import from spreadsheet (CSV/Excel) - via CSV Import
+- [ ] Folder hierarchy generator (requires backend API)
+- [ ] Task template application (requires backend API)
+- [ ] Team assignment (requires backend API)
 
 ## Phase 6: Reporting & Analytics
-- [ ] Dashboard widgets
-- [ ] Progress charts (burndown, velocity)
-- [ ] Artist productivity reports
-- [ ] Deadline tracking
+- [x] Dashboard widgets
+- [x] Progress charts (burndown, velocity)
+- [x] Artist productivity reports (via Workload view)
+- [x] Deadline tracking
 - [ ] Custom report builder
-
 ---
 
 ## API Requirements
